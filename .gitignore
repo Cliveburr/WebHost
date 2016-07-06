@@ -51,4 +51,6 @@ Temporary Items
 # =========================
 
 **/node_modules
-**/lib
+**/src/**/*.js
+**/src/**/*.d.ts
+**/src/**/*.js.map

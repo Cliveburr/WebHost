@@ -1,0 +1,16 @@
+{
+  "name": "webhost",
+  "version": "0.0.10",
+  "description": "A NodeJS framework for create general purpose web services.",
+  "main": "src/Index.js",
+  "typings": "src/Index",
+  "dependencies": {},
+  "devDependencies": {
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Adilson Manzoli Junior",
+  "license": "ISC",
+  "repository": "Cliveburr/WebHost"
+}

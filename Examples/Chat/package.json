@@ -1,0 +1,17 @@
+{
+  "name": "webhost-examples-chat",
+  "version": "0.0.1",
+  "description": "",
+  "main": "src/Index.js",
+  "typings": "src/Index",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "Adilson Manzoli Junior",
+  "license": "ISC",
+  "dependencies": {
+    "webhost": "^0.0.9",
+    "webhost-websocket": "^0.0.1"
+  }
+}
