@@ -24,7 +24,6 @@ export class StaticFiles implements IHttp.IPipeline {
             let findtp = StaticFiles.fileTypes.filter((t) => t.extension == extension);
             if (findtp.length > 0) {
                 let tp = findtp[0];
-                ctx.response.setHeader('etag', '1234');
                 ctx.response.writeHead(200, { "Content-Type": tp.contentType });
                 ctx.response.write(fs.readFileSync(file).toString());
                 ctx.alreadyProcess = true;

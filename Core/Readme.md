@@ -4,7 +4,6 @@ A [NodeJS](http://nodejs.org) framework for create general purpose web services.
 Write using [TypeScript](http://www.typescriptlang.org) with [Visual Studio Code](https://code.visualstudio.com).
 
 ```js
-/// <reference path="../typings/index.d.ts" />
 import webhost = require('webhost');
 
 var server = new webhost.Server({
@@ -70,8 +69,8 @@ npm install webhost --save
 code .
 ```
 
-## ShowCase
+## Example
 
 ```bash
-https://github.com/Cliveburr/WebHost/tree/master/WebHost.ShowCase
+https://github.com/Cliveburr/WebHost/tree/master/Examples/StaticFiles
 ```
