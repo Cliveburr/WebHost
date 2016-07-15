@@ -1,0 +1,13 @@
+{
+    "compilerOptions": {
+        "removeComments": true,
+        "declaration": true,
+        "module": "commonjs",
+        "target": "es2015",
+        "sourceMap": true,
+        "watch": false
+    },
+    "exclude": [
+        "node_modules"
+    ]
+}

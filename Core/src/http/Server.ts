@@ -4,6 +4,7 @@ import { AutoDictonary } from '../system/Dictonary';
 import Injector from './Injector';
 import * as IHttp from './IHttp';
 import ErrorNotFound from '../pipe/ErrorNotFound';
+import { Debug } from '../pipe/Debug';
 
 export class Server implements IHttp.IServer, IHttp.IServices {
     public httpServer: http.Server;
@@ -95,7 +96,8 @@ export class Server implements IHttp.IServer, IHttp.IServices {
         configure({
             use: (pipe) => this.pipe_use(pipe),
             useErrorNotFound: () => this.pipe_use(ErrorNotFound),
-            useService: (name) => this._injector.read(null, name)
+            useService: (name) => this._injector.read(null, name),
+            debug: () => this.pipe_use(Debug)
         });
     }
 

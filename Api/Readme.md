@@ -1,12 +1,11 @@
-# webhost-websocket
-A WebSocket implemantation for [WebHost](https://www.npmjs.com/package/webhost). 
+# webhost-api
+A Api implemantation for [WebHost](https://www.npmjs.com/package/webhost). 
 
 Write using [TypeScript](http://www.typescriptlang.org) with [Visual Studio Code](https://code.visualstudio.com).
 
 ```js
 import * as webhost from 'webhost';
-import * as websocket from 'webhost-websocket';
-import ChatHub from './ChatHub';
+import * as api from 'webhost-api';
 
 var server = new webhost.Server({
     rootApp: __dirname,
@@ -15,19 +14,18 @@ var server = new webhost.Server({
 
 server.configureServices((services): void => {
 
-    websocket.addServices(services, [
-        { path: 'Chat', item: ChatHub }
-    ]);
+    api.addServices(services, {
+        routes: [{
+            name: 'default',
+            pattern: 'api/{controller}/{action}'
+        }]
+    });
 
 });
 
 server.configure((app) => {
     
-    app.use(webhost.DefaultFiles);
-
-    app.use(webhost.StaticFiles);
-
-    app.use(websocket.ClientFile);
+    app.use(api.Api);
 
     app.useErrorNotFound();
 
@@ -40,7 +38,7 @@ server.listen(1338);
 ## Installation
 
 ```bash
-$ npm install webhost-websocket
+$ npm install webhost-api
 ```
 
 ## Features
@@ -69,7 +67,7 @@ $ typings install dt~node --global
 
 ```bash
 $ npm install webhost --save
-$ npm install webhost-websocket --save 
+$ npm install webhost-api --save 
 ```
 
   Work with code:
@@ -81,5 +79,5 @@ $ code .
 ## Example
 
 ```bash
-https://github.com/Cliveburr/WebHost/tree/master/Examples/Chat
+https://github.com/Cliveburr/WebHost/tree/master/Examples/SimpleApi
 ```

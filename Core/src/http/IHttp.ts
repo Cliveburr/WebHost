@@ -68,6 +68,7 @@ export interface IConfigure {
     use(pipe: IPipelineType): void;
     useErrorNotFound(): void;
     useService<T>(name: string): T;
+    debug(): void;
 }
 
 export interface IServerConfigs {
