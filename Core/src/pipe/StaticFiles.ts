@@ -17,7 +17,7 @@ export class StaticFiles implements IHttp.IPipeline {
 
         let file = path.resolve(ctx.server.wwwroot + pu.pathname);
 
-        console.log(file);
+        console.log(`${ctx.request.method}::${file}`);
 
         if (fs.existsSync(file)) {
             let extension = path.extname(file);
@@ -25,7 +25,7 @@ export class StaticFiles implements IHttp.IPipeline {
             if (findtp.length > 0) {
                 let tp = findtp[0];
                 ctx.response.writeHead(200, { "Content-Type": tp.contentType });
-                ctx.response.write(fs.readFileSync(file).toString());
+                ctx.response.write(fs.readFileSync(file));
                 ctx.alreadyProcess = true;
             }
         }

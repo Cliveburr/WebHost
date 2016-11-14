@@ -4,11 +4,11 @@ A [NodeJS](http://nodejs.org) framework for create general purpose web services.
 Write using [TypeScript](http://www.typescriptlang.org) with [Visual Studio Code](https://code.visualstudio.com).
 
 ```js
-import webhost = require('webhost');
+import * as webhost from 'webhost';
 
 var server = new webhost.Server({
     rootApp: __dirname,
-    wwwroot: __dirname + '/../src/wwwroot'
+    wwwroot: __dirname + '/wwwroot'
 });
 
 server.configureServices((services): void => {

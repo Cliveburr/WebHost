@@ -1,11 +1,12 @@
 {
   "name": "webhost",
-  "version": "0.0.15",
+  "version": "0.0.17",
   "description": "A NodeJS framework for create general purpose web services.",
-  "main": "src/Index.js",
-  "typings": "src/Index",
+  "main": "src/index.js",
+  "types": "src/index.d.ts",
   "dependencies": {},
   "devDependencies": {
+    "@types/node": "^6.0.46"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

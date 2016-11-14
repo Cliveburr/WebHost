@@ -54,3 +54,9 @@ Temporary Items
 **/src/**/*.js
 **/src/**/*.d.ts
 **/src/**/*.js.map
+**/test/**/*.js
+**/test/**/*.d.ts
+**/test/**/*.js.map
+**/bin/**/*.js
+**/bin/**/*.d.ts
+**/bin/**/*.js.map

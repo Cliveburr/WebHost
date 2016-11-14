@@ -7,8 +7,8 @@
         "src/**/*.js": true,
         "src/**/*.d.ts": true,
         "src/**/*.js.map": true,
-        "test/**/*.js": true,
-        "test/**/*.d.ts": true,
-        "test/**/*.js.map": true
+        "bin/**/*.js": true,
+        "bin/**/*.d.ts": true,
+        "bin/**/*.js.map": true
     }
 }
