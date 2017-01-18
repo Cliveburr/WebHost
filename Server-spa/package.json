@@ -1,14 +1,14 @@
 {
   "name": "webhost-server-spa",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Micro server for hosting SPA style apps using the Webhost.",
   "main": "src/index.js",
   "types": "src/index.d.ts",
   "dependencies": {
-    "webhost": "^0.0.17"
+    "webhost": "^0.0.18"
   },
   "devDependencies": {
-    "@types/node": "^6.0.46"
+    "@types/node": "^7.0.0"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",

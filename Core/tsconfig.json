@@ -5,10 +5,15 @@
         "module": "commonjs",
         "target": "es2015",
         "sourceMap": true,
-        "watch": false
+        "watch": false,
+        "allowUnreachableCode": false,
+        "allowUnusedLabels": false,
+        "noImplicitAny": true,
+        "noImplicitReturns": true,
+        "noImplicitUseStrict": false,
+        "noFallthroughCasesInSwitch": true
     },
     "typeRoots": [
-      "./node_modules/@types",
-      "./node_modules"
+      "./node_modules/@types"
     ]
 }

@@ -1,6 +1,4 @@
 # webhost-api
-A Api implemantation for [WebHost](https://www.npmjs.com/package/webhost). 
-
 Micro server for hosting SPA style apps using the [WebHost](https://www.npmjs.com/package/webhost).
 
 Write using [TypeScript](http://www.typescriptlang.org) with [Visual Studio Code](https://code.visualstudio.com).
