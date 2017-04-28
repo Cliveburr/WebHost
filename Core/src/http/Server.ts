@@ -85,10 +85,10 @@ export class Server implements IHttp.IServer, IHttp.IServices {
     public configureServices(configure: (services: IHttp.IConfigureServices) => void): void {
         configure({
             httpServer: this,
-            add: (services) => this.services_add(services),
-            addSingleton: (name, service) => this.add_directly(name, service, IHttp.ServicesType.Singleton),
-            addLocal: (name, service) => this.add_directly(name, service, IHttp.ServicesType.Local),
-            addPerRequest: (name, service) => this.add_directly(name, service, IHttp.ServicesType.PerRequest)
+            add: (services: IHttp.IServicesType) => this.services_add(services),
+            addSingleton: (name: string, service: IHttp.IServicesDirectlyType) => this.add_directly(name, service, IHttp.ServicesType.Singleton),
+            addLocal: (name: string, service: IHttp.IServicesDirectlyType) => this.add_directly(name, service, IHttp.ServicesType.Local),
+            addPerRequest: (name: string, service: IHttp.IServicesDirectlyType) => this.add_directly(name, service, IHttp.ServicesType.PerRequest)
         });
     }
 
@@ -96,7 +96,7 @@ export class Server implements IHttp.IServer, IHttp.IServices {
         configure({
             use: (pipe) => this.pipe_use(pipe),
             useErrorNotFound: () => this.pipe_use(ErrorNotFound),
-            useService: (name) => this._injector.read(null, name),
+            useService: (name: string) => this._injector.read(null, name),
             debug: () => this.pipe_use(Debug)
         });
     }
@@ -116,12 +116,12 @@ export class Server implements IHttp.IServer, IHttp.IServices {
         this._injector.add(newService);
 
         let fluent = {
-            on: (callBack) => {
+            on: (callBack: (service: T) => void) => {
                 if (newService.on_create)
                     newService.on_create.add(callBack);
                 return fluent;
             },
-            off: (callBack) => {
+            off: (callBack: (service: T) => void) => {
                 if (newService.on_destroy)
                     newService.on_destroy.add(callBack);
                 return fluent;
@@ -148,11 +148,11 @@ export class Server implements IHttp.IServer, IHttp.IServices {
         this._injector.add(newService);
 
         var fluent = {
-            on: (callBack) => {
+            on: (callBack: (service: T) => void) => {
                 newService.on_create.add(callBack);
                 return fluent;
             },
-            off: (callBack) => {
+            off: (callBack: (service: T) => void) => {
                 newService.on_destroy.add(callBack);
                 return fluent;
             }
