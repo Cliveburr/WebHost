@@ -46,11 +46,22 @@ export class StaticFiles implements IPipeline {
         
         if (fs.existsSync(file)) {
             let extension = path.extname(file);
-            let contentType = StaticFiles.getContentType(extension);
-            if (contentType) {
-                ctx.response.writeHead(200, { "Content-Type": contentType });
-                ctx.response.write(fs.readFileSync(file));
-                ctx.alreadyProcess = true;
+            if (extension == '.gz') {
+                extension = path.extname(file.substr(0, file.length - 3));
+                let contentType = StaticFiles.getContentType(extension);
+                if (contentType) {
+                    ctx.response.writeHead(200, { "Content-Encoding": "gzip", "Content-Type": contentType });
+                    ctx.response.write(fs.readFileSync(file));
+                    ctx.alreadyProcess = true;
+                }
+            }
+            else {
+                let contentType = StaticFiles.getContentType(extension);
+                if (contentType) {
+                    ctx.response.writeHead(200, { "Content-Type": contentType });
+                    ctx.response.write(fs.readFileSync(file));
+                    ctx.alreadyProcess = true;
+                }
             }
         }
 

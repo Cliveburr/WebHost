@@ -5,10 +5,9 @@
         "module": "commonjs",
         "target": "es2015",
         "sourceMap": true,
-        "watch": false
-    },
-    "typeRoots": [
-      "./node_modules/@types",
-      "./node_modules"
-    ]
+        "watch": false,
+        "types": [
+            "node"
+        ]
+    }
 }

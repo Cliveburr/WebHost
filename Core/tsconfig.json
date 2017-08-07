@@ -11,12 +11,9 @@
         "noImplicitAny": true,
         "noImplicitReturns": true,
         "noImplicitUseStrict": false,
-        "noFallthroughCasesInSwitch": true
-    },
-    "typeRoots": [
-        "./node_modules/@types"
-    ],
-    "types": [
-        "node"
-    ]
+        "noFallthroughCasesInSwitch": true,
+        "types": [
+            "node"
+        ]
+    }
 }

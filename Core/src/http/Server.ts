@@ -83,7 +83,7 @@ export class Server implements IHttp.IServer, IHttp.IServices {
     }
 
     public configureServices(configure: (services: IHttp.IConfigureServices) => void): void {
-        configure({
+        configure(<any>{
             httpServer: this,
             add: (services: IHttp.IServicesType) => this.services_add(services),
             addSingleton: (name: string, service: IHttp.IServicesDirectlyType) => this.add_directly(name, service, IHttp.ServicesType.Singleton),

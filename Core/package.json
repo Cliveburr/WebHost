@@ -1,17 +1,21 @@
 {
   "name": "webhost",
-  "version": "0.0.19",
+  "version": "0.0.21",
   "description": "A NodeJS framework for create general purpose web services.",
   "main": "src/index.js",
   "types": "src/index.d.ts",
   "dependencies": {},
   "devDependencies": {
-    "@types/node": "^7.0.12"
+    "@types/node": "^8.0.19"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": ["web", "host", "framework"],
+  "keywords": [
+    "web",
+    "host",
+    "framework"
+  ],
   "author": "Adilson Manzoli Junior",
   "license": "ISC",
   "repository": "Cliveburr/WebHost"

@@ -1,13 +1,17 @@
 #! /usr/bin/env node
 
 import * as webhost from 'webhost';
-import { SpaPipe } from '../src/spa-pipe';
+import { SpaPipe, SpaSetIndexFile } from '../src/spa-pipe';
 import * as path from 'path';
 
 var args = process.argv.slice(2);
 
 let root = path.resolve(__dirname + '\\..\\..\\..\\' + args[0]);
 let port = +args[1];
+
+if (args.length == 3) {
+    SpaSetIndexFile(args[2]);
+}
 
 console.log('Hosting with Webhost!')
 console.log('Root: ' + root);
