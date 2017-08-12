@@ -1,9 +1,9 @@
 {
   "name": "webhost",
-  "version": "0.0.21",
+  "version": "0.0.22",
   "description": "A NodeJS framework for create general purpose web services.",
   "main": "src/index.js",
-  "types": "src/index.d.ts",
+  "types": "src/index.ts",
   "dependencies": {},
   "devDependencies": {
     "@types/node": "^8.0.19"

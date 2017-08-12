@@ -1,17 +1,17 @@
 {
   "name": "webhost-server-spa",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "description": "Micro server for hosting SPA style apps using the Webhost.",
   "main": "src/index.js",
-  "types": "src/index.d.ts",
+  "types": "src/spa-pipe.ts",
   "dependencies": {
-    "webhost": "^0.0.21"
+    "webhost": "^0.0.22"
   },
   "devDependencies": {
     "@types/node": "^8.0.19"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "webhost-spa . 1339",
     "build": "tsc"
   },
   "keywords": [],
