@@ -1,5 +1,5 @@
 import * as http from 'http';
-import Event from '../system/Event';
+import { Event } from '../system/Event';
 
 export interface IServer {
     httpServer: http.Server;

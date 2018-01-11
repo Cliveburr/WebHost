@@ -1,17 +1,23 @@
 {
   "name": "webhost-websocket",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "WebSocket implemantation for WebHost.",
   "main": "src/Index.js",
   "typings": "src/Index",
   "dependencies": {
-    "webhost": "^0.0.13",
-    "ws": "^1.1.0"
+    "webhost": "^0.0.23",
+    "ws": "^4.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^9.3.0"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": ["webhost", "websocket"],
+  "keywords": [
+    "webhost",
+    "websocket"
+  ],
   "author": "Adilson Manzoli Junior",
   "license": "ISC",
   "repository": "Cliveburr/WebHost"

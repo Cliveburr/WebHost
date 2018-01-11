@@ -9,6 +9,7 @@ export interface IPath {
     index: number;
     name?: string;
     create(client: IClientHost): void;
+    [method: string]: any;
 }
 
 export interface IPathType {

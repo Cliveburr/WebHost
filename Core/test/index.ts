@@ -1,6 +1,6 @@
-import * as webhost from '../src/index';
+import { Server, DefaultFiles, StaticFiles } from '../src/index';
 
-var server = new webhost.Server({
+var server = new Server({
     rootApp: __dirname,
     wwwroot: __dirname + '/wwwroot'
 });
@@ -10,9 +10,9 @@ server.configureServices((services): void => {
 
 server.configure((app) => {
 
-    app.use(webhost.DefaultFiles);
+    app.use(DefaultFiles);
 
-    app.use(webhost.StaticFiles);
+    app.use(StaticFiles);
 
     app.useErrorNotFound();
 

@@ -1,5 +1,5 @@
 import { Server, DefaultFiles, StaticFiles } from 'webhost';
-import { addServices, ClientFile } from 'webhost-websocket';
+import { addServices, ClientFile } from '../src/Index';
 import ChatHub from './ChatHub';
 
 var server = new Server({

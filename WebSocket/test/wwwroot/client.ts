@@ -1,4 +1,3 @@
-/// <reference path="../../node_modules/webhost-websocket/src/client/websocket.d.ts" />
 
 class ChatHub implements WebHost.WebSocket.IPath {
     public index: number;

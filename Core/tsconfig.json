@@ -8,6 +8,8 @@
         "watch": false,
         "allowUnreachableCode": false,
         "allowUnusedLabels": false,
+        "noImplicitThis": true,
+        "noUnusedLocals": true,
         "noImplicitAny": true,
         "noImplicitReturns": true,
         "noImplicitUseStrict": false,

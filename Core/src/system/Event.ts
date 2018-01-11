@@ -1,5 +1,5 @@
 
-export default class Event<T> {
+export class Event<T> {
     private _events: Array<T>;
     public raise: T;
 

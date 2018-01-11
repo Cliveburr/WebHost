@@ -5,9 +5,17 @@
         "module": "commonjs",
         "target": "es2015",
         "sourceMap": true,
-        "watch": false
-    },
-    "exclude": [
-        "node_modules"
-    ]
+        "watch": false,
+        "allowUnreachableCode": false,
+        "allowUnusedLabels": false,
+        "noImplicitThis": true,
+        "noUnusedLocals": true,
+        "noImplicitAny": true,
+        "noImplicitReturns": true,
+        "noImplicitUseStrict": false,
+        "noFallthroughCasesInSwitch": true,
+        "types": [
+            "node"
+        ]
+    }
 }

@@ -3,6 +3,7 @@ module WebHost.WebSocket {
     export interface IPath {
         index: number;
         create(connection: Connection): void;
+        [method: string]: any;
     }
 
     export interface IPathType {
@@ -32,53 +33,47 @@ module WebHost.WebSocket {
     }
 
     export class Connection {
-        private _ws: any;
-        private _items: Array<IPath>;
-        private _itemsCount: number;
-        private _ready: boolean;
-        private _onReady: Function;
+        private ws: any;
+        private items: Array<IPath>;
+        private itemsCount: number;
+        private isReady: boolean;
+        private onReady: Function;
 
         constructor(
             private _address: string) {
-            this._ready = false;
-            this._items = [];
-            this._itemsCount = 0;
+            this.isReady = false;
+            this.items = [];
+            this.itemsCount = 0;
         }
 
         public connect(): Connection {
-            this._ws = new window['WebSocket'](this._address);
-            this._ws.onopen = this.open.bind(this);
-            this._ws.onmessage = this.onmessage.bind(this);
+            this.ws = new (<any>window)['WebSocket'](this._address);
+            this.ws.onopen = this.open.bind(this);
+            this.ws.onmessage = this.onmessage.bind(this);
             return this;
         }
 
         private open(): void {
-            this._ready = true;
-            if (this._onReady)
-                this._onReady();
+            this.isReady = true;
+            if (this.onReady)
+                this.onReady();
         }
 
         public ready(callBack: Function): void {
-            if (this._ready)
+            if (this.isReady)
                 callBack();
             else
-                this._onReady = callBack;
+                this.onReady = callBack;
         }
 
         private findPathItem(path: string): IPathItem {
-            for (let i = 0, p: IPathItem; p = paths[i]; i++) {
-                if (p.path == path)
-                    return p;
-            }
-            return null;
+            let find = paths.filter(p => p.path == path);
+            return find && find[0] ? find[0] : null;
         }
 
         private findItem(index: number): IPath {
-            for (let i = 0, p: IPath; p = this._items[i]; i++) {
-                if (p.index == index)
-                    return p;
-            }
-            return null;
+            let find = this.items.filter(i => i.index == index);
+            return find && find[0] ? find[0] : null;
         }
 
         public createPath<T extends IPath>(path: string): T {
@@ -88,10 +83,10 @@ module WebHost.WebSocket {
                 throw 'Path "' + path + '" not find!';
 
             var item = new p.item();
-            item.index = this._itemsCount;
+            item.index = this.itemsCount;
             item.create(this);
-            this._itemsCount++;
-            this._items.push(item);
+            this.itemsCount++;
+            this.items.push(item);
 
             this.send(item.index, null, 'create_item', path);
 
@@ -104,7 +99,7 @@ module WebHost.WebSocket {
                 method: method,
                 args: args
             };
-            this._ws.send(JSON.stringify(m));
+            this.ws.send(JSON.stringify(m));
         }
 
         private onmessage(data: any): void {
@@ -112,11 +107,15 @@ module WebHost.WebSocket {
 
             let path = this.findItem(msg.index);
 
-            if (!path)
-                throw 'não tem esse path'; //TODO: ver oque fazer
+            if (!path) {
+                console.error(`Invalid path: \"${path}\"!`);
+                return;
+            }
 
-            if (!path[msg.method])
-                throw 'não tem esse methodo';
+            if (!path[msg.method]) {
+                console.error(`Invalid method: \"${msg.method}\" on path: \"${path}\"!`);
+                return;
+            }
 
             path[msg.method].apply(path, msg.args);
         }

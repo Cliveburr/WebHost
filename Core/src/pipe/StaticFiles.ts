@@ -77,7 +77,6 @@ class FileInfo {
     }
 
     private checkContentAndCache(): boolean {
-
         if (this.requestHeaders['cache-control'] && this.requestHeaders['cache-control'] == 'no-cache') {
             this.statusCode = 200;
             this.hasContent = true;
@@ -91,7 +90,7 @@ class FileInfo {
         this.headers['Cache-Control'] = 'private';
         
         if (this.requestHeaders['if-modified-since']) {
-            let since = new Date(this.requestHeaders['if-modified-since']);
+            let since = new Date(this.requestHeaders['if-modified-since'].toString());
             since.setMilliseconds(0);
 
             if (modified.getTime() <= since.getTime()) {

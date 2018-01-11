@@ -1,7 +1,7 @@
 import * as http from 'http';
-import Event from '../system/Event';
+import { Event } from '../system/Event';
 import { AutoDictonary } from '../system/Dictonary';
-import Injector from './Injector';
+import { Injector } from './Injector';
 import * as IHttp from './IHttp';
 import ErrorNotFound from '../pipe/ErrorNotFound';
 import { Debug } from '../pipe/Debug';

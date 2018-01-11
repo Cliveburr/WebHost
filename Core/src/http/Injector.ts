@@ -1,6 +1,6 @@
 import * as IHttp from './IHttp';
 
-export default class Injector {
+export class Injector {
     private _services: IHttp.IServices[];
     private _requestCache: any;
 

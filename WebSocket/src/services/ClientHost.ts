@@ -1,40 +1,42 @@
-import * as Interface from '../IWebSocket';
+import { Event } from 'webhost';
+import { IPath, IPathItem, IMessage } from '../IWebSocket';
 import { WebSocketService } from './WebSocket';
 
 export default class ClientHost {
-    public items: Array<Interface.IPath>;
+    public items: Array<IPath>;
+    public onError: Event<(sender: ClientHost, error: string) => void>;
 
-    constructor(
+    public constructor(
         public id: string,
-        private _socket: any) {
+        private socket: any
+    ) {
         this.items = [];
-        _socket.on('message', this.message.bind(this));
-        _socket.on('close', this.close.bind(this));
+        this.onError = new Event();
+        socket.on('message', this.message.bind(this));
+        socket.on('close', this.close.bind(this));
+        socket.on('error', (error: any) => this.onError.raise(this, error));
     }
 
-    private findItem(index: number): Interface.IPath {
-        for (let i = 0, p: Interface.IPath; p = this.items[i]; i++) {
-            if (p.index == index)
-                return p;
-        }
-        return null;
+    private findItem(index: number): IPath {
+        let find = this.items.filter(i => i.index == index);
+        return find && find[0] ? find[0] : null;
     }
 
-    public findPathItem(path: string): Interface.IPathItem {
-        for (let i = 0, p: Interface.IPathItem; p = WebSocketService.instance.paths[i]; i++) {
-            if (p.path == path)
-                return p;
-        }
-        return null;
+    public findPathItem(path: string): IPathItem {
+        let find = WebSocketService.instance.paths.filter(p => p.path == path);
+        return find && find[0] ? find[0] : null;
     }
 
     private message(data: string): void {
-        let msg: Interface.IMessage = JSON.parse(data);
+        let msg: IMessage = JSON.parse(data);
+
         if (!msg.method && msg.args[0] === 'create_item') {
             let pathType = this.findPathItem(msg.args[1]);
 
-            if (!pathType)
-                throw 'não tem esse path type'; //TODO: ver oque fazer
+            if (!pathType) {
+                this.onError.raise(this, `Invalid path: ${pathType}!`);
+                return;
+            }
 
             let path = new pathType.item();
             path.index = msg.index;
@@ -45,11 +47,15 @@ export default class ClientHost {
         else {
             let path = this.findItem(msg.index);
 
-            if (!path)
-                throw 'não tem esse path'; //TODO: ver oque fazer
+            if (!path) {
+                this.onError.raise(this, `Invalid path: ${path}!`);
+                return;
+            }
 
-            if (!path[msg.method])
-                throw 'não tem esse methodo';
+            if (!path[msg.method]) {
+                this.onError.raise(this, `Invalid path type: ${msg.method}!`);
+                return;
+            }
 
             path[msg.method].apply(path, msg.args);
         }
@@ -60,19 +66,21 @@ export default class ClientHost {
     }
 
     public send(index: number, method: string, ...args: any[]): void {
-        var m: Interface.IMessage = {
+        var m: IMessage = {
             index: index,
             method: method,
             args: args
         };
-        this._socket.send(JSON.stringify(m));
+        this.socket.send(JSON.stringify(m));
     }
 
     public sendAll(index: number, method: string, ...args: any[]): void {
         let path = this.findItem(index);
 
-        if (!path)
-            throw 'não tem esse path'; //TODO: ver oque fazer
+        if (!path) {
+            this.onError.raise(this, `Invalid path: ${path}!`);
+            return;
+        }
 
         WebSocketService.instance.sendAll.apply(WebSocketService.instance, [path.name, method].concat(args));
     }

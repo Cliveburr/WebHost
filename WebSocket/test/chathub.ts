@@ -1,4 +1,4 @@
-import { IPath, IClientHost } from 'webhost-websocket';
+import { IPath, IClientHost } from '../src/Index';
 
 export default class ChatHub implements IPath {
     public index: number;
