@@ -1,6 +1,4 @@
 .vscode/
 node_modules/
-test/
-src/**/*.ts
-!src/**/*.d.ts
 .npmignore
+package-lock.json

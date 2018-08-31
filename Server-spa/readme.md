@@ -48,5 +48,5 @@ $ npm run serve
 ## Example
 
 ```bash
-https://github.com/Cliveburr/WebHost/tree/master/Server-Spa/test
+https://github.com/Cliveburr/WebHost/tree/master/test/server-spa
 ```

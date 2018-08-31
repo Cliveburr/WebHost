@@ -1,24 +1,27 @@
 {
   "name": "webhost-server-spa",
-  "version": "0.0.9",
+  "version": "0.1.0",
   "description": "Micro server for hosting SPA style apps using the Webhost.",
-  "main": "src/index.js",
-  "types": "src/spa-pipe.ts",
+  "main": "src/main.ts",
+  "types": "src/main.ts",
   "dependencies": {
-    "webhost": "^0.0.22"
+    "webhost": "^0.1.0"
   },
   "devDependencies": {
-    "@types/node": "^8.0.19"
+    "@types/node": "^10.9.4"
   },
-  "scripts": {
-    "test": "webhost-spa . 1339",
-    "build": "tsc"
-  },
-  "keywords": [],
+  "scripts": {},
+  "keywords": [
+    "webhost",
+    "web",
+    "host",
+    "framework",
+    "spa"
+  ],
   "author": "Adilson Manzoli Junior",
   "license": "ISC",
   "repository": "Cliveburr/WebHost",
   "bin": {
-    "webhost-spa": "bin/webhost-spa.js"
+    "webhost-spa": "./src/main.js"
   }
 }

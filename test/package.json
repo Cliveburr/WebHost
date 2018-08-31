@@ -1,0 +1,20 @@
+{
+  "name": "test",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "server-spa": "webhost-spa ./server-spa 1339"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "tslib": "^1.9.3",
+    "webhost": "file:../core",
+    "webhost-server-spa": "file:../server-spa",
+    "webhost-websocket": "file:../websocket"
+  },
+  "devDependencies": {
+    "@types/node": "^10.9.3"
+  }
+}

@@ -3,27 +3,34 @@ A [NodeJS](http://nodejs.org) framework for create general purpose web services.
 
 Write using [TypeScript](http://www.typescriptlang.org) with [Visual Studio Code](https://code.visualstudio.com).
 
-```js
-import { Server, StaticFiles } from 'webhost';
+```ts
+import { HttpApplication, IHttpApplication, IConfigure, IConfigureServices,
+    NotFound, DefaultFiles, StaticFiles } from 'webhost';
 
-var server = new Server({
-    rootApp: __dirname,
+@HttpApplication({
+    imports: [],
+    providers: [],
+    port: 1800,
     wwwroot: __dirname + '/wwwroot'
-});
+})
+export class HttpTestApplication implements IHttpApplication {
 
-server.configureServices((services): void => {
-});
+    public constructor(
+    ) {
+    }
 
-server.configure((app) => {
+    public configureServices(services: IConfigureServices): void {
+    }
 
-    app.use(StaticFiles);
+    public configure(app: IConfigure): void {
+     
+        app.use(DefaultFiles);
 
-    app.useErrorNotFound();
+        app.use(StaticFiles);
 
-});
-
-server.listen(1338);
-
+        app.use(NotFound);
+    }
+}
 ```
 
 ## Installation
@@ -36,7 +43,7 @@ $ npm install webhost
 
   * Lightweight
   * Modulate
-  * Inject system build on
+  * Dependencie Inject system build on
   * Core has none dependencies
 
 ## Docs
@@ -49,12 +56,6 @@ $ npm install webhost
 
 ```bash
 npm init -y
-```
-
-  Install the typings for node:
-
-```bash
-typings install dt~node --global
 ```
 
   Install WebHost:
@@ -72,5 +73,5 @@ code .
 ## Example
 
 ```bash
-https://github.com/Cliveburr/WebHost/tree/master/Examples/StaticFiles
+https://github.com/Cliveburr/WebHost/tree/master/test
 ```

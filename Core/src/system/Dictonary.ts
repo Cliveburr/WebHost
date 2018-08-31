@@ -1,35 +1,45 @@
 
 export class Dictonary<T> {
-    private _data: any = {};
-    private _count: number = 0;
-    get count() { return this._count; }
 
-    public set(id: string, item: T): boolean {
-        if (id in this._data) {
+    private data: { [key: string]: any };
+    private dataCount: number;
+
+    public constructor(
+    ) {
+        this.data = {};
+        this.dataCount = 0;
+    }
+
+    public get count(): number {
+        return this.dataCount;
+    }
+
+    public set(key: string, item: T): boolean {
+        if (key in this.data) {
             return false;
         }
         else {
-            this._data[id] = item;
-            this._count++;
+            this.data[key] = item;
+            this.dataCount++;
             return true;
         }
     }
 
-    public get(id: string): T {
-        if (id in this._data)
-            return this._data[id];
+    public get(key: string): T | undefined {
+        if (key in this.data)
+            return this.data[key];
         else
-            return null;
+            return undefined;
     }
 
-    public has(id: string): boolean {
-        return id in this._data;
+    public has(key: string): boolean {
+        return key in this.data;
     }
 
-    public remove(id: string): boolean {
-        if (id in this._data) {
-            delete this._data[id];
-            this._count--;
+    public remove(key: string): boolean {
+        if (key in this.data) {
+            delete this.data[key];
+            this.dataCount--;
             return true;
         }
         else {
@@ -38,33 +48,15 @@ export class Dictonary<T> {
     }
 
     public toList(): Array<T> {
-        return Object.keys(this._data).map((e: string) => {
-            return this._data[e];
-        });
-    }
-}
-
-export class AutoDictonary<T> extends Dictonary<T> {
-    constructor(
-        public chars: string,
-        public lenght: number) {
-        super();
+        return Object.keys(this.data)
+            .map(e => this.data[e]);
     }
 
-    public generateID = (): string => {
-        let tr: string;
-        do {
-            tr = "";
-            for (let i = 0; i < this.lenght; i++) {
-                tr += this.chars[Math.floor(Math.random() * this.chars.length)];
-            }
-        } while (this.has(tr));
-        return tr;
-    }
-
-    public autoSet(item: T): string {
-        let id = this.generateID();
-        this.set(id, item);
-        return id;
+    public clone(): Dictonary<T> {
+        let clone = new Dictonary<T>();
+        for (let key of Object.keys(this.data)) {
+            clone.set(key, this.data[key]);
+        }
+        return clone;
     }
 }
