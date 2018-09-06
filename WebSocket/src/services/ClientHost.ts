@@ -1,98 +1,137 @@
-import { Injectable } from 'webhost';
+import { DefinedProvider } from 'webhost';
+import { WebSocketService } from './websocket.service';
+import { HostService } from './host.service';
+import { paths } from '../path/path.decorator';
 
-// import { Event } from 'webhost';
-// import { IPath, IPathItem, IMessage } from '../IWebSocket';
-// import { WebSocketService } from './WebSocket';
+interface IMessage {
+    path: string;
+    method: string;
+    args?: any[];
+    request?: string;
+    response?: string;
+    value?: any;
+}
 
-@Injectable()
+interface IReturnStock {
+    guid: string;
+    execute: (value?: any) => void;
+}
+
 export class ClientHost {
 
-    public guid: string;
-    public webSocket: WebSocket;
-//     public items: Array<IPath>;
-//     public onError: Event<(sender: ClientHost, error: string) => void>;
+    private paths: { [key: string]: any };
+    private returnGuid: number;
+    private returnStock: { [guid: string]: IReturnStock }
 
     public constructor(
-//         public id: string,
-//         private socket: any
+        private guid: string,
+        private webSocket: WebSocket,
+        private webSocketService: WebSocketService
     ) {
-//         this.items = [];
-//         this.onError = new Event();
-//         socket.on('message', this.message.bind(this));
-//         socket.on('close', this.close.bind(this));
+        this.paths = {};
+        this.returnGuid = 0;
+        this.returnStock = {};
+        this.connect();
+    }
+
+    private connect(): void {
+        this.webSocket.onmessage = this.message.bind(this);
+        this.webSocket.onclose = this.close.bind(this);
 //         socket.on('error', (error: any) => this.onError.raise(this, error));
     }
 
-    public connection(guid: string, webSocket: WebSocket): void {
-        this.guid = guid;
-        this.webSocket = webSocket;
+    private getPath(path: string): any {
+        let lowPath = path.toLowerCase();
+        if (!this.paths[lowPath]) {
+            let hostProvider = new DefinedProvider(HostService, new HostService(this, path));
+            let cls = paths[lowPath];
+            if (!cls) {
+                throw 'Can\'t find the path: ' + path;
+            }            
+            this.paths[lowPath] = this.webSocketService.injector.create(cls, hostProvider);
+        }
+        return this.paths[lowPath];
     }
 
-//     private findItem(index: number): IPath {
-//         let find = this.items.filter(i => i.index == index);
-//         return find && find[0] ? find[0] : null;
-//     }
+    private message(event: MessageEvent): void {
+        
+        let msg: IMessage = JSON.parse(event.data);
+        if (msg.response) {
+            let returnStock = this.returnStock[msg.response];
+            if (!returnStock) {
+                throw 'Internal Error! ReturnStock not found!';
+            }
+            delete this.returnStock[msg.response];
+            returnStock.execute(msg.value);
+        }
+        else {
+            let path = this.getPath(msg.path);
 
-//     public findPathItem(path: string): IPathItem {
-//         let find = WebSocketService.instance.paths.filter(p => p.path == path);
-//         return find && find[0] ? find[0] : null;
-//     }
+            if (!path[msg.method]) {
+                throw `Invalid method: "${msg.method}" on path: "${msg.path}"!`;
+            }
 
-//     private message(data: string): void {
-//         let msg: IMessage = JSON.parse(data);
+            let value = undefined;
+            try {
+                value = path[msg.method].apply(path, msg.args);
+            }
+            catch(err) {
 
-//         if (!msg.method && msg.args[0] === 'create_item') {
-//             let pathType = this.findPathItem(msg.args[1]);
+            }
 
-//             if (!pathType) {
-//                 this.onError.raise(this, `Invalid path: ${pathType}!`);
-//                 return;
-//             }
+            if (msg.request) {
+                let returnMsg: IMessage = {
+                    method: msg.method,
+                    path: msg.path,
+                    response: msg.request,
+                    value
+                }
+                this.webSocket.send(JSON.stringify(returnMsg));
+            }
+        }
+    }
 
-//             let path = new pathType.item();
-//             path.index = msg.index;
-//             path.name = msg.args[1];
-//             path.create(this);
-//             this.items.push(path);
-//         }
-//         else {
-//             let path = this.findItem(msg.index);
+    public close(): void {
+        this.webSocketService.clients.remove(this.guid);
+        for (let path in this.paths) {
+            delete this.paths[path];
+        }
+        delete this.paths;
+        delete this.webSocketService;
+    }
 
-//             if (!path) {
-//                 this.onError.raise(this, `Invalid path: ${path}!`);
-//                 return;
-//             }
+    public call(path: string, method: string, ...args: any[]): void {
+        var m: IMessage = {
+            path,
+            method,
+            args
+        };
+        this.webSocket.send(JSON.stringify(m));
+    }
 
-//             if (!path[msg.method]) {
-//                 this.onError.raise(this, `Invalid path type: ${msg.method}!`);
-//                 return;
-//             }
+    public callr(path: string, method: string, ...args: any[]): Promise<any> {
+        return new Promise((e, r) => {
+            
+            let newGuid = (this.returnGuid++).toString();
+            let newReturnStock: IReturnStock = {
+                guid: newGuid,
+                execute: e
+            }
+            this.returnStock[newGuid] = newReturnStock;
 
-//             path[msg.method].apply(path, msg.args);
-//         }
-//     }
+            var m: IMessage = {
+                path,
+                method,
+                args,
+                request: newGuid
+            };
+            this.webSocket.send(JSON.stringify(m));
+        });
+    }
 
-//     public close(): void {
-//         WebSocketService.instance.clients.remove(this.id);
-//     }
-
-//     public send(index: number, method: string, ...args: any[]): void {
-//         var m: IMessage = {
-//             index: index,
-//             method: method,
-//             args: args
-//         };
-//         this.socket.send(JSON.stringify(m));
-//     }
-
-//     public sendAll(index: number, method: string, ...args: any[]): void {
-//         let path = this.findItem(index);
-
-//         if (!path) {
-//             this.onError.raise(this, `Invalid path: ${path}!`);
-//             return;
-//         }
-
-//         WebSocketService.instance.sendAll.apply(WebSocketService.instance, [path.name, method].concat(args));
-//     }
+    public callAll(path: string, method: string, ...args: any[]): void {
+        for (let client of this.webSocketService.clients.toList()) {
+            client.call(path, method, ...args);
+        }
+    }
 }

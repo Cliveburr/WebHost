@@ -1,16 +1,16 @@
 import * as http from 'http';
 import { Server } from 'ws';
 import { Injectable, IConfigureServices, Injector, GuidDictonary } from "webhost";
-import { ClientHost } from './ClientHost';
+import { ClientHost } from './clientHost';
 
 @Injectable()
 export class WebSocketService {
 
-    private webSocket: Server;
+    public server: Server;
     public clients: GuidDictonary<ClientHost>
 
     public constructor(
-        private injector: Injector
+        public injector: Injector
     ) {
         this.clients = new GuidDictonary<ClientHost>();
     }
@@ -20,14 +20,13 @@ export class WebSocketService {
     }
 
     private startWebSocket(httpServer: http.Server): void {
-        this.webSocket = new Server({ server: httpServer });
-        this.webSocket.on('connection', this.connection.bind(this));
+        this.server = new Server({ server: httpServer });
+        this.server.on('connection', this.connection.bind(this));
     }
 
     private connection(webSocket: WebSocket): void {
-        debugger;
-        let clientHost = this.injector.get(ClientHost) as ClientHost;
-        let guid = this.clients.autoSet(clientHost);
-        clientHost.connection(guid, webSocket);
+        let guid = this.clients.getFreeGuid();
+        let clientHost = new ClientHost(guid, webSocket, this);
+        this.clients.set(guid, clientHost);
     }
 }

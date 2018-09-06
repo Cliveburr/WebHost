@@ -4,37 +4,73 @@ A WebSocket implemantation for [WebHost](https://www.npmjs.com/package/webhost).
 Write using [TypeScript](http://www.typescriptlang.org) with [Visual Studio Code](https://code.visualstudio.com).
 
 ```js
-import * as webhost from 'webhost';
-import * as websocket from 'webhost-websocket';
-import ChatHub from './ChatHub';
+import { HttpApplication, IHttpApplication, IConfigure, IConfigureServices,
+    NotFound, DefaultFiles, StaticFiles, IContext } from 'webhost';
+import { WebSocketModule, WebSocketService } from 'webhost-websocket';
 
-var server = new webhost.Server({
-    rootApp: __dirname,
+import { ChatHub } from './chathub';
+
+@HttpApplication({
+    imports: [WebSocketModule],
+    providers: [ChatHub],
+    port: 1800,
     wwwroot: __dirname + '/wwwroot'
-});
+})
+export class HttpTestApplication implements IHttpApplication {
 
-server.configureServices((services): void => {
+    public constructor(
+        private webSocketService: WebSocketService
+    ) {
+    }
 
-    websocket.addServices(services, [
-        { path: 'Chat', item: ChatHub }
-    ]);
+    public configureServices(services: IConfigureServices): void {
 
-});
+        this.webSocketService.configureWebSocket(services);
+    }
 
-server.configure((app) => {
-    
-    app.use(webhost.DefaultFiles);
+    public configure(app: IConfigure): void {
+     
+        app.use((ctx: IContext, next: () => void) => {
+            if (ctx.request.url && ctx.request.url.startsWith('/node_modules/')) {
+                ctx.request.url = '../../..' + ctx.request.url;
+            }
+            next();
+        });
 
-    app.use(webhost.StaticFiles);
+        app.use(DefaultFiles);
 
-    app.use(websocket.ClientFile);
+        app.use(StaticFiles);
 
-    app.useErrorNotFound();
+        app.use(NotFound);
+    }
+}
+```
 
-});
+```js
+import { HostService, Path } from 'webhost-websocket';
 
-server.listen(1338);
+@Path({
+    name: 'chat'
+})
+export class ChatHub {
 
+    public constructor(
+        private host: HostService
+    ) {
+        setTimeout(() => {
+            this.host.callr<string>('getclient')
+                .then(d => console.log('client: ' + d));
+        }, 3000);
+    }
+
+    public send(user: string, msg: string): void {
+        this.receive(user, msg);
+    }
+
+    public receive(user: string, msg: string): void {
+        this.host.callAll('receive', user, msg);
+    }
+}
 ```
 
 ## Installation
@@ -59,16 +95,9 @@ $ npm install webhost-websocket
 $ npm init -y
 ```
 
-  Install the typings for node:
-
-```bash
-$ typings install dt~node --global
-```
-
   Install WebHost:
 
 ```bash
-$ npm install webhost --save
 $ npm install webhost-websocket --save 
 ```
 
@@ -81,5 +110,5 @@ $ code .
 ## Example
 
 ```bash
-https://github.com/Cliveburr/WebHost/tree/master/Examples/Chat
+https://github.com/Cliveburr/WebHost/tree/master/test/websocket
 ```

@@ -1,5 +1,5 @@
 import { IProvider, StaticProvider } from '../provider/providers';
-import { InjectorInstance } from '../provider/injectorInstance';
+import { Injector } from '../provider/injectorInstance';
 import { IProviderContainer } from '../provider/providerContainer';
 import { ModuleService } from './module.service';
 
@@ -21,12 +21,15 @@ export class ModuleInstance implements IProviderContainer {
     public exports?: Array<IProviderContainer | IProvider>;
 
     public constructor(
-        data: ModuleData,
-        protected injector: InjectorInstance
+        protected injector: Injector
     ) {
+    }
+
+    public generate(data: ModuleData, cls: Object): void {
         this.generateImports(data.imports);
         this.generateProviders(data.providers);
         this.generateExports(data.exports);
+        this.generateInstance(cls);
     }
 
     private generateImports(imports: Array<ImportType> | undefined): void {
@@ -66,9 +69,9 @@ export class ModuleInstance implements IProviderContainer {
                     array.push(expt);
                 }
                 else {
-                    let resolved = this.injector.resolveProvider(this, expt);
-                    if (resolved) {
-                        array.push(resolved.provider);
+                    let provider = this.injector.resolveProvider(this, expt);
+                    if (provider) {
+                        array.push(provider);
                     }
                     else {
                         array.push(ModuleService.instance.get(expt));
@@ -97,28 +100,36 @@ export class ModuleInstance implements IProviderContainer {
                 }
                 else {
                     let isInjectable = Reflect.getOwnMetadata('injectable:is', provider);
-                    if (!isInjectable) {
+                    if (typeof isInjectable == 'undefined') {
                         throw 'Injectable class need to be defined with Injectable decorator!';
                     }
 
-                    array.push(this.createProviderFromObject(provider));
+                    if (isInjectable) {
+                        let providerInstance = this.createProviderFromObject(provider);
+                        if (array.indexOf(providerInstance) == -1) {
+                            array.push(providerInstance);
+                        }
+                    }
                 }
             }
         }
     }
 
-    public generateInstance(cls: Object): void {
-        this.instance = this.injector.create(this, cls);
+    private generateInstance(cls: Object): void {
+        this.instance = this.injector.create(cls);
     }
 
     private createProviderFromObject(cls: Object): IProvider {
 
         let data = Reflect.getOwnMetadata('injectable:data', cls);
         if (data) {
-            //TODO: usar as informações para configurar
+            //TODO: usar as informações para configurar seus providers
         }
 
-        let provider = new StaticProvider(cls);
+        let provider = Reflect.getOwnMetadata('injectable:provider', cls);
+        if (!provider) {
+            provider = new StaticProvider(cls);
+        }
 
         return provider;
     }

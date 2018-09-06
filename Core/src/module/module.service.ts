@@ -1,4 +1,4 @@
-import { InjectorInstance } from '../provider/injectorInstance';
+import { Injector } from '../provider/injectorInstance';
 import { ModuleInstance } from './moduleInstance';
 
 interface ModuleStore {
@@ -13,7 +13,7 @@ export class ModuleService {
     private modules: ModuleStore[];
 
     public constructor(
-        private injector: InjectorInstance
+        private injector: Injector
     ) {
         this.modules = [];
     }
@@ -27,12 +27,12 @@ export class ModuleService {
             let data = Reflect.getOwnMetadata('module:data', cls);
             
             store = {
-                module: new ModuleInstance(data, this.injector),
+                module: new ModuleInstance(this.injector),
                 cls
             }
             
             this.modules.push(store);
-            store.module.generateInstance(cls);
+            store.module.generate(data, cls);
         }
 
         return store.module;

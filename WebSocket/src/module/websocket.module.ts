@@ -1,9 +1,8 @@
-import { Module, AsRequestProvider } from "webhost";
+import { Module } from "webhost";
 import { WebSocketService } from "../services/websocket.service";
-import { ClientHost } from '../services/ClientHost';
 
 @Module({
-    providers: [WebSocketService, new AsRequestProvider(ClientHost)],
+    providers: [WebSocketService],
     exports: [WebSocketService]
 })
 export class WebSocketModule {

@@ -2,7 +2,7 @@ export * from './src/application/appDecorator';
 export * from './src/module/moduleDecorator';
 export * from './src/provider/injectableDecorator';
 export * from './src/provider/providers';
-export * from './src/provider/injection';
+export * from './src/provider/injectorInstance';
 
 export * from './src/http/server/app.decorator';
 export * from './src/http/server/app.data';

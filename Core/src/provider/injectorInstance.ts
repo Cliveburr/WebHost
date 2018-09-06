@@ -1,40 +1,51 @@
 import { IProviderContainer } from './providerContainer';
 import { IProvider } from './providers';
-import { Injector } from './injection';
 
-export class InjectorInstance {
+export interface InjectorContext {
+    identifier: any;
+    create(target: Object): any;
+}
+
+export class Injector {
     
     private resolving: Object[];
 
     public constructor(
+        private appContainer: IProviderContainer
     ) {
         this.resolving = [];
     }
 
-    public get(container: IProviderContainer, identifier: any): any {
+    public get(identifier: any, ...customs: IProvider[]): any {
 
         // TODO: criar um cache de providers já resolvidos para ganhar velocidade
-        let resolved = this.resolveProvider(container, identifier);
+        let provider: IProvider | undefined = undefined;
+        if (customs) {
+            provider = this.resolveProvider({ providers: customs }, identifier);
+        }
+
+        if (!provider) {
+            provider = this.resolveProvider(this.appContainer, identifier);
+        }
 
         // TODO: verificar decorator optional
-        if (!resolved) {
-            if (identifier === Injector) {
-                return new Injector(container, this);
-            }
-
+        if (!provider) {
             throw 'Can\'t find provider for identifier: ' + identifier.toString();
         }
 
-        if (resolved.provider.instance) {
-            return resolved.provider.instance;
+        if (provider.instance) {
+            return provider.instance;
         }
         else
         {
-            return resolved.provider.create(new Injector(resolved.container, this));
+            return provider.create({
+                identifier,
+                create: (target: Object) => this.create(target, ...customs)
+            });
         }
     }
 
-    public create(container: IProviderContainer, target: Object): any {
+    public create(target: Object, ...customs: IProvider[]): any {
 
         let isResolving = this.resolving.indexOf(target);
         if (isResolving != -1) {
@@ -46,7 +57,7 @@ export class InjectorInstance {
 
         // TODO: verificar os providers do decorador injectable
         let objs = args
-            .map(a => this.get(container, a));
+            .map(a => this.get(a, ...customs));
 
         let obj = new (<ObjectConstructor>target)(...objs);
 
@@ -56,15 +67,12 @@ export class InjectorInstance {
         return obj;
     }
 
-    public resolveProvider(container: IProviderContainer, identifier: any): { container: IProviderContainer, provider: IProvider } | undefined {
+    public resolveProvider(container: IProviderContainer, identifier: any): IProvider | undefined {
 
         if (container.providers) {
             for (let provider of container.providers) {
                 if (provider.identify(identifier)) {
-                    return {
-                        container,
-                        provider
-                    };
+                    return provider;
                 }
             }
         }
@@ -81,16 +89,13 @@ export class InjectorInstance {
         return undefined;
     }
 
-    private resolveImpoted(container: IProviderContainer, identifier: any): { container: IProviderContainer, provider: IProvider } | undefined {
+    private resolveImpoted(container: IProviderContainer, identifier: any): IProvider | undefined {
 
         if (container.exports) {
             for (let exported of container.exports) {
                 if (this.isProvider(exported)) {
                     if (exported.identify(identifier)) {
-                        return {
-                            container,
-                            provider: exported
-                        };
+                        return exported;
                     }
                 }
                 else {

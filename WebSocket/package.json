@@ -1,10 +1,10 @@
 {
   "name": "webhost-websocket",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "WebSocket implemantation for WebHost.",
   "dependencies": {
     "tslib": "^1.9.3",
-    "webhost": "file:../core",
+    "webhost": "0.1.1",
     "ws": "^6.0.0"
   },
   "devDependencies": {

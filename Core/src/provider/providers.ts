@@ -1,9 +1,9 @@
-import { Injector } from './injection';
+import { Injector, InjectorContext } from './injectorInstance';
 
 export interface IProvider {
     identify: (identifier: any) => boolean;
     instance: any;
-    create: (injector: Injector) => any;
+    create: (context: InjectorContext) => any;
 }
 
 export class StaticProvider implements IProvider {
@@ -19,11 +19,28 @@ export class StaticProvider implements IProvider {
         return this.refer === identifier;
     }
 
-    public create(injector: Injector): any {
+    public create(context: InjectorContext): any {
         if (!this.instance) {
-            this.instance = injector.create(this.refer);
+            this.instance = context.create(this.refer);
         }
         return this.instance;
+    }
+}
+
+export class DefinedProvider implements IProvider {
+
+    public constructor(
+        private refer: any,
+        public instance: any
+    ) {
+    }
+
+    public identify(identifier: any): boolean {
+        return this.refer === identifier;
+    }
+
+    public create(): any {
+        throw 'Unnecessary create method called!';
     }
 }
 
@@ -40,7 +57,7 @@ export class AsRequestProvider implements IProvider {
         return this.refer === identifier;
     }
 
-    public create(injector: Injector): any {
-        return injector.create(this.refer);
+    public create(context: InjectorContext): any {
+        return context.create(this.refer);
     }
 }

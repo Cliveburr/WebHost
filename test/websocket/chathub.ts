@@ -1,19 +1,24 @@
-import { Injectable } from 'webhost';
+import { HostService, Path } from 'webhost-websocket';
 
-@Injectable()
+@Path({
+    name: 'chat'
+})
 export class ChatHub {
-    public index: number;
-    // private client: IClientHost;
 
-    // public create(client: IClientHost): void {
-    //     this.client = client;
-    // }
+    public constructor(
+        private host: HostService
+    ) {
+        setTimeout(() => {
+            this.host.callr<string>('getclient')
+                .then(d => console.log('client: ' + d));
+        }, 3000);
+    }
 
     public send(user: string, msg: string): void {
-        //this.receive(user, msg);
+        this.receive(user, msg);
     }
 
     public receive(user: string, msg: string): void {
-        //this.client.sendAll(this.index, 'receive', user, msg);
+        this.host.callAll('receive', user, msg);
     }
 }

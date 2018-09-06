@@ -1,6 +1,6 @@
 import * as http from 'http';
 import { HttpApplicationData, IHttpApplication, Diagnostic } from './app.data';
-import { InjectorInstance } from '../../provider/injectorInstance';
+import { Injector } from '../../provider/injectorInstance';
 import { AppInstance } from '../../application/appInstance';
 import { ModuleService } from '../../module/module.service';
 import { Configure } from './configure';
@@ -16,37 +16,42 @@ export class HttpAppInstance extends AppInstance {
 
     private httpServer: http.Server;
     private data: HttpApplicationData;
-    private cls: IHttpApplication;
+    //private cls: IHttpApplication;
     private pipes: IPipelineType[];
     private serverValues: Dictonary<any>;
     private contexts: GuidDictonary<IContext>;
 
     public constructor(
         data: HttpApplicationData,
-        injector: InjectorInstance
+        cls: Object
     ) {
-        super(data, injector);
+        super(data, cls);
         this.contexts = new GuidDictonary<IContext>();
+        this.startHttp(data);
     }
 
     public static generate(data: HttpApplicationData, cls: Object): void {
         if (AppInstance.instance) {
             throw 'Only one application is allow for execution!';
         }
+        AppInstance.instance = new HttpAppInstance(data, cls);
 
-        let injector = new InjectorInstance();
-        ModuleService.instance = new ModuleService(injector);
-        this.defineCustomData(data);
-        
-        let httpInstance = new HttpAppInstance(data, injector);
-        AppInstance.instance = httpInstance;
-        AppInstance.instance.generateInstance(cls);
+        // let httpInstance = new HttpAppInstance(data, cls);
+        // AppInstance.instance = httpInstance;
 
-        httpInstance.startHttp(data);
+        // let injector = new Injector(AppInstance.instance);
+        // AppInstance.instance.injector = injector;
+        // ModuleService.instance = new ModuleService(injector);
+
+        // AppInstance.defineCustomData(data, injector);
+        // AppInstance.instance.generate(data);
+        // AppInstance.instance.generateInstance(cls);
+
+        // httpInstance.startHttp(data);
     }
 
     private startHttp(data: HttpApplicationData): void {
-        this.cls = AppInstance.instance.instance;
+        //this.cls = AppInstance.instance.instance;
         this.data = data;
 
         this.setBasicPipes();
@@ -81,12 +86,12 @@ export class HttpAppInstance extends AppInstance {
         this.httpServer = http.createServer(this.handleRequest.bind(this));
 
         let toConfigureServices = new ConfigureServices(this.serverValues, this.httpServer);
-        this.cls.configureServices(toConfigureServices);
+        (<IHttpApplication>this.instance).configureServices(toConfigureServices);
     }
 
     private configure(): void {
         let toConfigure = new Configure();
-        this.cls.configure(toConfigure.safeUser());
+        (<IHttpApplication>this.instance).configure(toConfigure.safeUser());
         this.pipes = toConfigure.pipes;
     }
 
@@ -118,7 +123,7 @@ export class HttpAppInstance extends AppInstance {
                         });
                     }
                     else {
-                        let instance = this.injector.get(this, pipe) as IPipeline;
+                        let instance = this.injector.get(pipe) as IPipeline;
 
                         instance.process(ctx, () => {
                             i++;

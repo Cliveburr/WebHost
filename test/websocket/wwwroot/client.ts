@@ -1,61 +1,57 @@
-import { client } from 'webhost-websocket/src/client/websocket';
+import { WebHostWebSocket as client } from 'webhost-websocket/src/client/websocket';
 
+class ChatHub extends client.Path {
 
-var a = new client.Test();
-alert(a.value);
+    public static path = 'chat';
+    private receiveDiv: HTMLDivElement;
 
+    public constructor() {
+        super();
+        this.receiveDiv = <HTMLDivElement>document.getElementById('receive');
+    }
 
-// class ChatHub implements WebHost.WebSocket.IPath {
-//     public index: number;
-//     private conn: WebHost.WebSocket.Connection;
-//     private receiveDiv: HTMLDivElement;
+    public send(user: string, msg: string): void {
+        super.call('send', user, msg);
+    }
 
-//     public create(connection: WebHost.WebSocket.Connection): void {
-//         this.conn = connection;
-//         this.receiveDiv = <HTMLDivElement>document.getElementById('receive');
-//     }
+    public receive(user: string, msg: string): void {
+        let p = document.createElement('p');
+        p.innerText = user + ': ' + msg;
+        this.receiveDiv.appendChild(p);
+    }
 
-//     public send(user: string, msg: string): void {
-//         this.conn.send(this.index, 'send', user, msg);
-//     }
-
-//     public receive(user: string, msg: string): void {
-//         let p = document.createElement('p');
-//         p.innerText = user + ': ' + msg;
-//         this.receiveDiv.appendChild(p);
-//     }
-// }
-
-// WebHost.WebSocket.paths.push({ path: 'Chat', item: ChatHub });
-// var host = window.document.location.host.replace(/:.*/, '');
-// var ws = WebHost.WebSocket.connect(host, 1338);
-
-// ws.ready(() => {
-
-//     var user = <HTMLInputElement>document.getElementById('user');
-//     var msg = <HTMLInputElement>document.getElementById('msg');
-//     var sender = <HTMLInputElement>document.getElementById('sender');
-
-//     var chat = ws.createPath<ChatHub>('Chat');
-
-//     sender.onclick = (ev) => {
-
-//         let userName = user.value;
-//         if (!userName) {
-//             alert('Must be have a name!');
-//             return;
-//         }
-
-//         let userMsg = msg.value;
-//         if (!userMsg) {
-//             alert('Must be a msg!');
-//             return;
-//         }
-
-//         chat.send(user.value, msg.value);
-//     };
-// });
-
-class Client {
-    public value = 'a';
+    public getclient(): string {
+        return navigator.platform;
+    }
 }
+
+
+let ws = new client.Host({
+    paths: [ChatHub]
+});
+ws.connect()
+    .then(() => {
+
+    let user = <HTMLInputElement>document.getElementById('user');
+    let msg = <HTMLInputElement>document.getElementById('msg');
+    let sender = <HTMLInputElement>document.getElementById('sender');
+
+    let chat = ws.getPath(ChatHub);
+
+    sender.onclick = (ev) => {
+
+        let userName = user.value;
+        if (!userName) {
+            alert('Must be have a name!');
+            return;
+        }
+
+        let userMsg = msg.value;
+        if (!userMsg) {
+            alert('Must be a msg!');
+            return;
+        }
+
+        chat.send(user.value, msg.value);
+    };
+});

@@ -1,19 +1,19 @@
-import { IProviderContainer } from './providerContainer';
-import { InjectorInstance } from './injectorInstance';
+// import { IProviderContainer } from './providerContainer';
+// import { InjectorInstance } from './injectorInstance';
 
-export class Injector {
+// export class Injector {
 
-    public constructor(
-        private container: IProviderContainer,
-        private instance: InjectorInstance
-    ) {
-    }
+//     public constructor(
+//         private container: IProviderContainer,
+//         private instance: InjectorInstance
+//     ) {
+//     }
 
-    public get(identifier: any): any {
-        return this.instance.get(this.container, identifier);
-    }
+//     public get(identifier: any): any {
+//         return this.instance.get(this.container, identifier);
+//     }
 
-    public create(target: Object): any {
-        return this.instance.create(this.container, target);
-    }
-}
+//     public create(target: Object): any {
+//         return this.instance.create(this.container, target);
+//     }
+// }
