@@ -16,7 +16,6 @@ export class HttpAppInstance extends AppInstance {
 
     private httpServer: http.Server;
     private data: HttpApplicationData;
-    //private cls: IHttpApplication;
     private pipes: IPipelineType[];
     private serverValues: Dictonary<any>;
     private contexts: GuidDictonary<IContext>;
@@ -35,23 +34,9 @@ export class HttpAppInstance extends AppInstance {
             throw 'Only one application is allow for execution!';
         }
         AppInstance.instance = new HttpAppInstance(data, cls);
-
-        // let httpInstance = new HttpAppInstance(data, cls);
-        // AppInstance.instance = httpInstance;
-
-        // let injector = new Injector(AppInstance.instance);
-        // AppInstance.instance.injector = injector;
-        // ModuleService.instance = new ModuleService(injector);
-
-        // AppInstance.defineCustomData(data, injector);
-        // AppInstance.instance.generate(data);
-        // AppInstance.instance.generateInstance(cls);
-
-        // httpInstance.startHttp(data);
     }
 
     private startHttp(data: HttpApplicationData): void {
-        //this.cls = AppInstance.instance.instance;
         this.data = data;
 
         this.setBasicPipes();

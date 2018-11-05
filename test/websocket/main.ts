@@ -3,10 +3,11 @@ import { HttpApplication, IHttpApplication, IConfigure, IConfigureServices,
 import { WebSocketModule, WebSocketService } from 'webhost-websocket';
 
 import { ChatHub } from './chathub';
+import { Session } from './session';
 
 @HttpApplication({
     imports: [WebSocketModule],
-    providers: [ChatHub],
+    providers: [ChatHub, Session],
     port: 1800,
     wwwroot: __dirname + '/wwwroot'
 })

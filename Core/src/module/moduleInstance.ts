@@ -126,7 +126,7 @@ export class ModuleInstance implements IProviderContainer {
             //TODO: usar as informações para configurar seus providers
         }
 
-        let provider = Reflect.getOwnMetadata('injectable:provider', cls);
+        let provider = Reflect.getOwnMetadata('injectable:provider', cls);   //TODO: se tiver provider, como proceder?
         if (!provider) {
             provider = new StaticProvider(cls);
         }

@@ -29,14 +29,6 @@ export class AppInstance extends ModuleInstance {
             throw 'Only one application is allow for execution!';
         }
         AppInstance.instance = new AppInstance(data, cls);
-
-        //let injector = new Injector(AppInstance.instance);
-        //AppInstance.instance.injector = injector;
-        //ModuleService.instance = new ModuleService(injector);
-
-        //AppInstance.defineCustomData(data, injector);
-        //AppInstance.instance.generate(data);
-        //AppInstance.instance.generateInstance(cls);
     }
 
     protected defineCustomData(data: ApplicationData): void {

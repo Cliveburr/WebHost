@@ -24,6 +24,11 @@ export class ModuleService {
             .find(m => m.cls === cls);
         
         if (!store) {
+            let isModule = Reflect.getOwnMetadata('module:is', cls);
+            if (!isModule) {
+                throw 'Invalid module! ' + cls.toString();
+            }
+
             let data = Reflect.getOwnMetadata('module:data', cls);
             
             store = {

@@ -1,7 +1,8 @@
-import { DefinedProvider } from 'webhost';
+import { DynamicProvider, IProvider, StaticProvider } from 'webhost';
 import { WebSocketService } from './websocket.service';
 import { HostService } from './host.service';
 import { paths } from '../path/path.decorator';
+import { hostInjectables } from './hostinjectable.decorator';
 
 interface IMessage {
     path: string;
@@ -22,6 +23,7 @@ export class ClientHost {
     private paths: { [key: string]: any };
     private returnGuid: number;
     private returnStock: { [guid: string]: IReturnStock }
+    private providers: IProvider[];
 
     public constructor(
         private guid: string,
@@ -40,15 +42,24 @@ export class ClientHost {
 //         socket.on('error', (error: any) => this.onError.raise(this, error));
     }
 
+    private getProviders(path: string): IProvider[] {
+        if (!this.providers) {
+            this.providers = hostInjectables
+                .map(k => new StaticProvider(k));
+        }
+        return this.providers.concat([
+            new DynamicProvider(HostService, () => new HostService(this, path))
+        ]);
+    }
+
     private getPath(path: string): any {
         let lowPath = path.toLowerCase();
         if (!this.paths[lowPath]) {
-            let hostProvider = new DefinedProvider(HostService, new HostService(this, path));
             let cls = paths[lowPath];
             if (!cls) {
                 throw 'Can\'t find the path: ' + path;
             }            
-            this.paths[lowPath] = this.webSocketService.injector.create(cls, hostProvider);
+            this.paths[lowPath] = this.webSocketService.injector.create(cls, ...this.getProviders(path));
         }
         return this.paths[lowPath];
     }
