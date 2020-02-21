@@ -1,0 +1,27 @@
+{
+  "name": "webhost",
+  "version": "0.1.2",
+  "description": "A NodeJS framework for create general purpose web services.",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "rmdir /s /q bin & tsc --watch",
+    "package": "rmdir /s /q dist & tsc --build tsconfig-package.json"
+  },
+  "keywords": [
+    "webhost",
+    "web",
+    "host",
+    "framework"
+  ],
+  "author": "Adilson Manzoli Junior",
+  "repository": "Cliveburr/WebHost",
+  "license": "ISC",
+  "dependencies": {
+    "providerjs": "^0.0.5"
+  },
+  "devDependencies": {
+    "@types/node": "^13.1.7",
+    "typescript": "^3.7.5"
+  }
+}

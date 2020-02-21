@@ -1,5 +1,9 @@
+
+bin/
 node_modules/
 package-lock.json
+
+
 *.js
 *.d.ts
 *.js.map
