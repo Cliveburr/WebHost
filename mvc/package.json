@@ -1,7 +1,7 @@
 {
-  "name": "webhost",
-  "version": "0.1.2",
-  "description": "A NodeJS framework for create general purpose web services.",
+  "name": "webhost-mvc",
+  "version": "0.0.1",
+  "description": "",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
@@ -10,15 +10,15 @@
   },
   "keywords": [
     "webhost",
-    "web",
-    "host",
-    "framework"
+    "api",
+    "mvc"
   ],
-  "author": "Adilson Manzoli Junior",
-  "repository": "Cliveburr/WebHost",
+  "author": "Adilson Manzoli junior",
   "license": "ISC",
+  "repository": "Cliveburr/WebHost",
   "dependencies": {
-    "providerjs": "^0.0.6"
+    "providerjs": "^0.0.6",
+    "webhost": "file:../http/webhost-0.1.2.tgz"
   },
   "devDependencies": {
     "@types/node": "^13.1.7",

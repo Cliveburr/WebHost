@@ -5,7 +5,7 @@ export interface IPipeline {
 }
 
 export interface IPipelineConstructor {
-    new (): IPipeline;
+    new (...args: any[]): IPipeline;
 }
 
 export interface IPipelineDelegate {

@@ -15,6 +15,18 @@
             "outFiles": [
                 "${workspaceFolder}/http/bin/**/*.js"
             ]
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Mvc Test",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "program": "${workspaceFolder}/mvc/tests/all.tests.ts",
+            "outFiles": [
+                "${workspaceFolder}/mvc/bin/**/*.js"
+            ]
         }
     ]
 }

@@ -49,6 +49,7 @@ export class HttpApplicationInstance extends ApplicationInstance {
     }
     
     private setServerValues(): void {
+        this.serverValues.set('approot', this.data.approot);
         this.serverValues.set('wwwroot', this.data.wwwroot);
     }
 
@@ -65,7 +66,7 @@ export class HttpApplicationInstance extends ApplicationInstance {
 
     private configureServices(): http.Server {
         let httpServer = http.createServer(this.handleRequest.bind(this));
-        let toConfigureServices = new ConfigureServices(this.serverValues, httpServer);
+        let toConfigureServices = new ConfigureServices(this.serverValues, httpServer, this.module.injector);
         (<IHttpApplication>this.module.instance).configureServices(toConfigureServices);
         return httpServer;
     }
@@ -97,8 +98,6 @@ export class HttpApplicationInstance extends ApplicationInstance {
         };
         ctx.guid = this.contexts.autoSet(ctx);
         this.processPipe(ctx, 0);
-        res.end();
-        this.contexts.remove(ctx.guid);
     }
 
     private processPipe(ctx: IContext, index: number): void {
@@ -113,10 +112,17 @@ export class HttpApplicationInstance extends ApplicationInstance {
                     (<IPipelineDelegate>pipe)(ctx, this.processPipe.bind(this, ctx, index + 1));
                 }
             }
+            else {
+                ctx.response.end();
+                this.contexts.remove(ctx.guid);
+            }
         }
         catch (err) {
             this.logDiagnostic(err, DiagnosticLevel.Error);
             ctx.response.statusCode = 500;
+            ctx.response.write(JSON.stringify(err));
+            ctx.response.end();
+            this.contexts.remove(ctx.guid);
         }
     }
 

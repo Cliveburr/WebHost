@@ -2,6 +2,7 @@ import * as http from 'http';
 import { IPipelineType } from '../pipe';
 import { Dictonary } from '../common/dictonary';
 import { DiagnosticLevel } from '../diagnostic/diagnostic.data';
+import { Injector } from 'providerjs';
 
 export interface IContext {
     guid: string;
@@ -26,4 +27,5 @@ export interface IConfigure {
 export interface IConfigureServices {
     serverValues: Dictonary<any>;
     httpServer: http.Server;
+    injector: Injector;
 }
