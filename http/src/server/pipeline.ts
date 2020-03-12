@@ -1,4 +1,4 @@
-import { IContext } from '../server/httpApplication.data';
+import { IContext } from './httpApplication.data';
 
 export interface IPipeline {
     process(ctx: IContext, next: () => void): void;

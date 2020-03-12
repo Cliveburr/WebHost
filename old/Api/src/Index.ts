@@ -1,5 +1,5 @@
 import * as webhost from 'webhost';
-import * as Interface from '../src/IApi';
+import * as Interface from './IApi';
 import { RouteService } from './services/Route';
 import { ControllerSelector } from './services/ControllerSelector';
 import { FormatterService } from './services/Formatter';

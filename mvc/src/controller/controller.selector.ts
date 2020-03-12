@@ -1,8 +1,9 @@
+import * as urlService from 'url';
 import * as path from 'path';
 import * as fs from 'fs';
 import { IContext } from 'webhost';
 import { IRouteInfo } from '../pipe/route.service';
-import { Injectable, Injector, IProviderContainer, AsRequestProvider, Required } from 'providerjs';
+import { Injectable, Injector, AsRequestProvider, Required } from 'providerjs';
 import { HttpError } from '../pipe/mvc.pipe';
 
 export class HttpReponse {
@@ -11,7 +12,6 @@ export class HttpReponse {
         public code: number,
         public data?: any
     ) {
-
     }
 
     public get isHttpResponse(): boolean {
@@ -19,22 +19,28 @@ export class HttpReponse {
     }
 }
 
+interface ITypeCache {
+    type: Object;
+    actions: { [key: string]: IActionCache };
+}
+
+interface IActionCache {
+    methodName: string;
+    argsName: string[];
+}
+
 @Injectable()
 export class ControllerSelector {
     
-    private ctrTypesCache: { [key: string]: Object };
-    private providersContainer: IProviderContainer
+    private ctrTypesCache: { [key: string]: ITypeCache };
 
     public constructor(
-        @Required() private injector: Injector
+        private injector: Injector
     ) {
         this.ctrTypesCache = {};
-        this.providersContainer = {
-            providers: []
-        };
     }
 
-    private getType(ctx: IContext, route: IRouteInfo): Object | undefined {
+    private getType(ctx: IContext, route: IRouteInfo): ITypeCache | undefined {
         const controller = route.data['controller'];
 
         if (controller in this.ctrTypesCache) {
@@ -55,52 +61,58 @@ export class ControllerSelector {
             return undefined;
         }
 
-        this.providersContainer.providers?.push(new AsRequestProvider(ctrType));
-        this.ctrTypesCache[controller] = ctrType;
-        return ctrType;
+        this.injector.providers.push(new AsRequestProvider(ctrType));
+        this.ctrTypesCache[controller] = {
+            type: ctrType,
+            actions: {}
+        };
+        return this.ctrTypesCache[controller];
+    }
+
+    private getAction(action: string, typeCache: ITypeCache): IActionCache | undefined {
+        const lowAction = action.toLowerCase();
+        if (lowAction in typeCache.actions) {
+            return typeCache.actions[lowAction];
+        }
+
+        const prototype = (<any>typeCache.type).prototype;
+        const keys = Object.getOwnPropertyNames(prototype);
+        for (let key of keys) {
+            if (key.toLowerCase() === lowAction && typeof prototype[action] === "function") {
+                typeCache.actions[lowAction] = {
+                    methodName: key,
+                    argsName: this.getArgs(prototype[key])
+                };
+                return typeCache.actions[lowAction];
+            }
+        }
+        return undefined;
     }
 
     public async processRequest(ctx: IContext, route: IRouteInfo): Promise<HttpReponse> {
-        const ctrType = this.getType(ctx, route);
-        if (!ctrType) {
+        const ctrCache = this.getType(ctx, route);
+        if (!ctrCache) {
             throw new HttpError(404, `Controller for ${ctx.request.url} is missing!`);
         }
 
-        const controller = this.injector.get(ctrType, this.providersContainer);
-
-        if (!('action' in route.data)) {
+        const action = route.data['action'];
+        if (typeof action == 'undefined') {
             throw new HttpError(404, `Invalid null action!`);
         }
 
-        let method: Function | null  = null;
-        let action = route.data['action']
-
-        if (action) {
-            let lowAction = action.toLowerCase();
-            const keys = Object.getOwnPropertyNames((<any>ctrType).prototype);
-            for (let key of keys) {
-                if (key.toLowerCase() === lowAction && typeof controller[action] === "function") {
-                    method = controller[key];
-                    break;
-                }
-            }
-        }
-
-        if (!method) {
-            action = ctx.request.method?.toLowerCase() || '';
-            if (typeof controller[action] === "function") {
-                method = controller[action];
-            }
-        }
-
-        if (!method) {
+        const actionCache = this.getAction(action, ctrCache);
+        if (!actionCache) {
             throw new HttpError(405, `Method not allowed "${action}"!`);
         }
 
-        const tt = Reflect.getOwnMetadataKeys(ctrType);
-        const ttt = Reflect.getMetadataKeys(ctrType);
-        const args = (Reflect.getOwnMetadata('design:paramtypes', method) || []) as any[];
-        const retData = method.apply(controller);
+        const sessionProvider = ctx.values.get('sessionProvider');
+        const controller = sessionProvider ?
+            this.injector.get(ctrCache.type, sessionProvider)
+            : this.injector.get(ctrCache.type);
+        const method = controller[actionCache.methodName];
+
+        const args = this.makeArgs(actionCache.argsName, ctx.request.url || '/');
+        const retData = method.apply(controller, args);
 
         if (this.isPromise(retData)) {
             return new Promise<HttpReponse>(executor => {
@@ -113,6 +125,31 @@ export class ControllerSelector {
             return this.checkData(retData);
         }
     }
+
+    private makeArgs(argsNames: string[], url: string): any[] {
+        const urlParsed = urlService.parse(url, true);
+        const query = urlParsed.query;
+        const args: any[] = [];
+        for (let argName of argsNames) {
+            if (argName in query) {
+                args.push(query[argName]);
+            }
+            else {
+                args.push(undefined);
+            }
+        }
+        return args;
+    }
+
+    private getArgs(func: Function): string[] {  
+        return (func + '')
+          .replace(/[/][/].*$/mg,'') // strip single-line comments
+          .replace(/\s+/g, '') // strip white space
+          .replace(/[/][*][^/*]*[*][/]/g, '') // strip multi-line comments  
+          .split('){', 1)[0].replace(/^[^(]*[(]/, '') // extract the parameters  
+          .replace(/=[^,]+/g, '') // strip any ES6 defaults  
+          .split(',').filter(Boolean); // split & filter [""]
+    } 
 
     private checkData(data: any): HttpReponse {
         if (data) {
@@ -135,20 +172,4 @@ export class ControllerSelector {
     private isHttpResponse(obj: any): obj is HttpReponse {
         return typeof obj?.isHttpResponse !== 'undefined' && obj.isHttpResponse;
     }
-
-
-
-
-    //         let query = url.parse(context.request.url, true).query;
-    //         let ret = method.apply(controller, [{
-    //             queryString: query,
-    //             routeData: route.data
-    //         }]);
-    //         if (ret) {
-    //             callBack(ret);
-    //         }
-    //     } catch (e) {
-    //         callBack(new results.InternalErrorResult(e));
-    //     }
-    // }
 }

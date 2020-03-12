@@ -1,11 +1,12 @@
-import { HttpApplication, IHttpApplication, IConfigureServices, IConfigure, StaticFiles, DefaultFiles } from 'webhost';
+import { HttpApplication, IHttpApplication, IConfigureServices, IConfigure, StaticFiles, DefaultFiles, NotFound, FileModule } from 'webhost';
 import { MvcModule } from '../src/module/mvc.module';
 import { MvcPipe } from '../src/pipe/mvc.pipe';
 import { configureMvc } from '../src/module/configure';
-import { IdentityPipe } from '../src/pipe/identity.pipe';
+import { SessionPipe } from '../src/session/session.pipe';
+import { SessionModule } from '../src/session/session.module';
 
 @HttpApplication({
-    imports: [MvcModule],
+    imports: [MvcModule, FileModule /*, SessionModule*/],
     port: 8081,
     approot: __dirname,
     wwwroot: __dirname + '\\..\\..\\tests\\wwwroot'
@@ -37,7 +38,7 @@ export class AllMvcTests implements IHttpApplication {
         //     next();
         // });
 
-        app.use(IdentityPipe);
+        app.use(SessionPipe);
 
         app.use(MvcPipe);
 
@@ -45,6 +46,6 @@ export class AllMvcTests implements IHttpApplication {
 
         app.use(StaticFiles);
 
-        app.useErrorNotFound();
+        app.use(NotFound);
     }
 }

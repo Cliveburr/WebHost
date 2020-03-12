@@ -3,7 +3,7 @@ import * as path from 'path';
 import * as fs from 'fs';
 import * as url from 'url';
 import { Injectable } from 'providerjs';
-import { IPipeline } from './pipeline';
+import { IPipeline } from '../server/pipeline';
 import { IContext } from '../server/httpApplication.data';
 import { DiagnosticLevel } from '../diagnostic/diagnostic.data';
 import { Dictonary } from '../common/dictonary';

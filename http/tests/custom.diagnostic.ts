@@ -1,4 +1,4 @@
-import { Injectable, StaticProvider, ProviderIdentify } from 'providerjs';
+import { Injectable, StaticProvider, Identify } from 'providerjs';
 import { HttpApplication } from '../src/server/httpApplication.decorator';
 import { IHttpApplication, IConfigureServices, IConfigure } from '../src/server/httpApplication.data';
 import { IDiagnostic, DiagnosticLevel, DIAGNOSTIC_PROVIDER, DIAGNOSTIC_LEVEL_PROVIDER } from '../src/diagnostic/diagnostic.data';
@@ -7,7 +7,7 @@ import { IDiagnostic, DiagnosticLevel, DIAGNOSTIC_PROVIDER, DIAGNOSTIC_LEVEL_PRO
 class CustomDiagnostic implements IDiagnostic {
 
     public constructor(
-        @ProviderIdentify(DIAGNOSTIC_LEVEL_PROVIDER) private appDiagnosticLevel: DiagnosticLevel
+        @Identify(DIAGNOSTIC_LEVEL_PROVIDER) private appDiagnosticLevel: DiagnosticLevel
     ) {
     }
 
@@ -45,6 +45,5 @@ export class BasicPipe implements IHttpApplication {
             next();
         });
 
-        app.useErrorNotFound();
     }
 }

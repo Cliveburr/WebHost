@@ -1,13 +1,14 @@
 import { Injectable } from 'providerjs';
-import { IPipeline } from './pipeline';
+import { IPipeline } from '../server/pipeline';
 import { IContext } from '../server/httpApplication.data';
 
 @Injectable()
-export class NotFound implements IPipeline {
-    
+export class DefaultFiles implements IPipeline {
+     
     public process(ctx: IContext, next: () => void): void {
-        ctx.response.statusCode = 404;
-        ctx.processed = true;
+        if (ctx.request.url == '/') {
+            ctx.request.url = '/index.html';
+        }
         next();
     }
 }

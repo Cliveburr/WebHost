@@ -1,10 +1,13 @@
 import { HttpApplication } from '../src/server/httpApplication.decorator';
 import { IHttpApplication, IConfigureServices, IConfigure } from '../src/server/httpApplication.data';
+import { FileModule, DefaultFiles, StaticFiles, NotFound } from '../src';
 
 @HttpApplication({
-    port: 8081
+    imports: [FileModule],
+    port: 8081,
+    wwwroot: __dirname + '\\..\\..\\tests\\wwwroot'
 })
-export class BasicPipe implements IHttpApplication {
+export class StaticPipe implements IHttpApplication {
     
     public constructor(
     ) {
@@ -15,10 +18,11 @@ export class BasicPipe implements IHttpApplication {
 
     public configure(app: IConfigure): void {
      
-        app.use((ctx, next) => {
-            ctx.response.write('hit');
-            next();
-        });
+        app.use(DefaultFiles);
+
+        app.use(StaticFiles);
+
+        app.use(NotFound);
 
     }
 }

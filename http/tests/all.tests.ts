@@ -1,4 +1,6 @@
 
 //require('./basic.pipe');
 
-require('./custom.diagnostic');
+//require('./custom.diagnostic');
+
+require('./static.file');

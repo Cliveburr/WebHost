@@ -1,8 +1,8 @@
 import * as http from 'http';
-import { ApplicationInstance, ModuleInstance, StaticProvider, IProvider, DefinedProvider } from 'providerjs';
+import { ApplicationInstance, DefinedProvider } from 'providerjs';
 import { Dictonary } from '../common/dictonary';
 import { GuidDictonary } from '../common/guid.dictonary';
-import { NotFound, DefaultFiles, StaticFiles, IPipelineType, IPipeline, IPipelineDelegate } from '../pipe';
+import { IPipelineType, IPipeline, IPipelineDelegate } from './pipeline';
 import { HttpApplicationData } from './httpApplication.decorator';
 import { Configure } from './configure';
 import { IHttpApplication, IContext } from './httpApplication.data';
@@ -17,7 +17,6 @@ export class HttpApplicationInstance extends ApplicationInstance {
     private pipes: IPipelineType[];
     private serverValues: Dictonary<any>;
     private contexts: GuidDictonary<IContext>;
-    private module: ModuleInstance;
     private diagnostic: IDiagnostic;
 
     constructor(
@@ -27,11 +26,9 @@ export class HttpApplicationInstance extends ApplicationInstance {
 
         this.serverValues = new Dictonary<any>();
         this.contexts = new GuidDictonary<IContext>();
-        this.module = (<any>cls).__module__;
 
         this.data = <HttpApplicationData>Reflect.getOwnMetadata('module:data', cls);
 
-        this.setBasicPipes();
         this.setServerValues();
         this.diagnostic = this.setDiagnostic();
         this.httpServer = this.configureServices();
@@ -39,23 +36,14 @@ export class HttpApplicationInstance extends ApplicationInstance {
         this.startServer();
     }
 
-    private setBasicPipes(): void {
-        let basicPipes = <IProvider[]>[
-            new StaticProvider(NotFound),
-            new StaticProvider(DefaultFiles),
-            new StaticProvider(StaticFiles)
-        ];
-        this.module.container.providers?.push(...basicPipes);
-    }
-    
     private setServerValues(): void {
         this.serverValues.set('approot', this.data.approot);
         this.serverValues.set('wwwroot', this.data.wwwroot);
     }
 
     private setDiagnostic(): IDiagnostic {
-        this.module.container.providers?.push(new DefinedProvider(DIAGNOSTIC_LEVEL_PROVIDER, this.data.diagnostic || DiagnosticLevel.Normal));
-        let diagnostic = this.module.injector.getNotNeed(DIAGNOSTIC_PROVIDER);
+        this.module.providers?.push(new DefinedProvider(DIAGNOSTIC_LEVEL_PROVIDER, this.data.diagnostic || DiagnosticLevel.Normal));
+        let diagnostic = <IDiagnostic>this.module.get(DIAGNOSTIC_PROVIDER, false);
         if (diagnostic) {
             return diagnostic;
         }

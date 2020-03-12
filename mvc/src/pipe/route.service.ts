@@ -1,4 +1,4 @@
-import { Injectable, ProviderIdentify } from 'providerjs';
+import { Injectable, Identify } from 'providerjs';
 import { MVC_CONFIGURATION_PROVIDER, IConfiguration } from '../module/configure';
 
 export interface IRoute {
@@ -20,7 +20,7 @@ export class RouteService {
     private routes: IRoute[];
 
     constructor(
-        @ProviderIdentify(MVC_CONFIGURATION_PROVIDER) configuration: IConfiguration
+        @Identify(MVC_CONFIGURATION_PROVIDER) configuration: IConfiguration
     ) {
         this.varRegex = /^\{(.*?)\}$/i;
         this.routes = configuration?.routes || [];

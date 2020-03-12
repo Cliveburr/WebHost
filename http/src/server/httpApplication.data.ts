@@ -1,5 +1,5 @@
 import * as http from 'http';
-import { IPipelineType } from '../pipe';
+import { IPipelineType } from './pipeline';
 import { Dictonary } from '../common/dictonary';
 import { DiagnosticLevel } from '../diagnostic/diagnostic.data';
 import { Injector } from 'providerjs';
@@ -21,7 +21,6 @@ export interface IHttpApplication {
 
 export interface IConfigure {
     use(pipe: IPipelineType): void;
-    useErrorNotFound(): void;
 }
 
 export interface IConfigureServices {
