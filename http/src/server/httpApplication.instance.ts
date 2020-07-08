@@ -7,14 +7,14 @@ import { HttpApplicationData } from './httpApplication.decorator';
 import { Configure } from './configure';
 import { IHttpApplication, IContext } from './httpApplication.data';
 import { ConfigureServices } from './configureServices';
-import { IDiagnostic, DIAGNOSTIC_LEVEL_PROVIDER, DIAGNOSTIC_PROVIDER, DiagnosticLevel } from '../diagnostic/diagnostic.data';
+import { IDiagnostic, DIAGNOSTIC_LEVEL_PROVIDER, DIAGNOSTIC_PROVIDER, DiagnosticLevel, DIAGNOSTIC_INSTANCE } from '../diagnostic/diagnostic.data';
 import { DefaultDiagnostic } from '../diagnostic/default.diagnostic';
 
 export class HttpApplicationInstance extends ApplicationInstance {
 
-    private httpServer: http.Server;
+    private httpServer?: http.Server;
     private data: HttpApplicationData;
-    private pipes: IPipelineType[];
+    private pipes?: IPipelineType[];
     private serverValues: Dictonary<any>;
     private contexts: GuidDictonary<IContext>;
     private diagnostic: IDiagnostic;
@@ -31,6 +31,9 @@ export class HttpApplicationInstance extends ApplicationInstance {
 
         this.setServerValues();
         this.diagnostic = this.setDiagnostic();
+    }
+
+    protected appOnInit(): void {
         this.httpServer = this.configureServices();
         this.pipes = this.configure();
         this.startServer();
@@ -42,19 +45,20 @@ export class HttpApplicationInstance extends ApplicationInstance {
     }
 
     private setDiagnostic(): IDiagnostic {
-        this.module.providers?.push(new DefinedProvider(DIAGNOSTIC_LEVEL_PROVIDER, this.data.diagnostic || DiagnosticLevel.Normal));
         let diagnostic = <IDiagnostic>this.module.get(DIAGNOSTIC_PROVIDER, false);
-        if (diagnostic) {
-            return diagnostic;
+        if (!diagnostic) {
+            diagnostic = new DefaultDiagnostic(this.data.diagnostic || DiagnosticLevel.Normal)
         }
-        else {
-            return new DefaultDiagnostic(this.data.diagnostic || DiagnosticLevel.Normal)
-        }
+        const diagnosticLevelProvider = new DefinedProvider(DIAGNOSTIC_LEVEL_PROVIDER, this.data.diagnostic || DiagnosticLevel.Normal);
+        const diagnosticInstanceProvider = new DefinedProvider(DIAGNOSTIC_INSTANCE, diagnostic);
+        this.module.providers.push(diagnosticLevelProvider, diagnosticInstanceProvider);
+        this.module.exports.push(diagnosticLevelProvider, diagnosticInstanceProvider);
+        return diagnostic;
     }
 
     private configureServices(): http.Server {
-        let httpServer = http.createServer(this.handleRequest.bind(this));
-        let toConfigureServices = new ConfigureServices(this.serverValues, httpServer, this.module.injector);
+        const httpServer = http.createServer(this.handleRequest.bind(this));
+        const toConfigureServices = new ConfigureServices(this.serverValues, httpServer, this.module.injector);
         (<IHttpApplication>this.module.instance).configureServices(toConfigureServices);
         return httpServer;
     }
@@ -70,7 +74,7 @@ export class HttpApplicationInstance extends ApplicationInstance {
     }
 
     private startServer(): void {
-        this.httpServer.listen(this.data.port || 1338);
+        this.httpServer?.listen(this.data.port || 1338);
         this.logDiagnostic(`Server started: http://localhost:${(this.data.port || 1338).toString()}`);
     }
 
@@ -90,7 +94,7 @@ export class HttpApplicationInstance extends ApplicationInstance {
 
     private processPipe(ctx: IContext, index: number): void {
         try {
-            let pipe = this.pipes[index];
+            let pipe =  (this.pipes) ? this.pipes[index] : undefined;
             if (pipe && !ctx.processed) {
                 if (pipe.prototype) {
                     let instance = this.module.injector.get(pipe) as IPipeline;
@@ -115,6 +119,6 @@ export class HttpApplicationInstance extends ApplicationInstance {
     }
 
     private logDiagnostic(text: any, level?: DiagnosticLevel): void {
-        this.diagnostic.log(text, level);
+        this.diagnostic?.log(text, level);
     }
 }

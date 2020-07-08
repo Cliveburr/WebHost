@@ -39,16 +39,3 @@ export class SessionStore {
         return this.store.remove(sessionId);
     }
 }
-
-// export class SessionProvider implements IProvider {
-    
-
-
-//     public identify(identifier: any): boolean {
-//         return identifier === Session;
-//     }
-
-//     public get(context: InjectorContext): any {
-
-//     }
-// }

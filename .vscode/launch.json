@@ -27,6 +27,18 @@
             "outFiles": [
                 "${workspaceFolder}/mvc/bin/**/*.js"
             ]
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "WebSocket Test",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "program": "${workspaceFolder}/websocket/tests/with_angular/host/main.ts",
+            "outFiles": [
+                "${workspaceFolder}/websocket/bin/**/*.js"
+            ]
         }
     ]
 }

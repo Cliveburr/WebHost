@@ -6,7 +6,8 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "rmdir /s /q bin & tsc --watch",
-    "pack": "rmdir /s /q dist & tsc --build tsconfig-package.json"
+    "pack": "rmdir /s /q dist & tsc --build tsconfig-package.json",
+    "pushishoff": "npm pack"
   },
   "keywords": [
     "webhost",
@@ -18,7 +19,7 @@
   "repository": "Cliveburr/WebHost",
   "license": "ISC",
   "dependencies": {
-    "providerjs": "^0.0.10"
+    "providerjs": "file:../../libs/providerjs-0.0.13-4.tgz"
   },
   "devDependencies": {
     "@types/node": "^13.1.7",

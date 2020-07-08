@@ -9,3 +9,5 @@ package-lock.json
 *.js.map
 
 !/mvc/tests/wwwroot/*.js
+
+*.tgz
