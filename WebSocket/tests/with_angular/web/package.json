@@ -7,7 +7,9 @@
     "build": "ng build",
     "test": "ng test",
     "lint": "ng lint",
-    "e2e": "ng e2e"
+    "e2e": "ng e2e",
+    "ngrok": "ngrok http 4200",
+    "ngrokserve": "ng serve --proxy-config proxy.conf.json --port 4200 --publicHost ad31be9cea98.ngrok.io"
   },
   "private": true,
   "dependencies": {
@@ -21,7 +23,8 @@
     "@angular/router": "~10.0.2",
     "rxjs": "~6.5.5",
     "tslib": "^2.0.0",
-    "zone.js": "~0.10.3"
+    "zone.js": "~0.10.3",
+    "webhost-websocket-client": "file:../../../../websocket-client"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "~0.1000.1",
@@ -30,6 +33,7 @@
     "@types/node": "^12.11.1",
     "ts-node": "~8.3.0",
     "tslint": "~6.1.0",
-    "typescript": "~3.9.5"
+    "typescript": "~3.9.5",
+    "ngrok": "^3.2.7"
   }
 }

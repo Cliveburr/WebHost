@@ -1,7 +1,7 @@
 {
-  "name": "webhost-websocket",
-  "version": "0.1.1",
-  "description": "WebSocket implemantation for WebHost.",
+  "name": "webhost-websocket-client",
+  "version": "0.0.1",
+  "description": "WebSocket client implemantation for WebHost-websocket.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
@@ -16,14 +16,8 @@
   "author": "Adilson Manzoli Junior",
   "license": "ISC",
   "repository": "Cliveburr/WebHost",
-  "dependencies": {
-    "providerjs": "file:../../libs/providerjs-0.0.13-7.tgz",
-    "webhost": "file:../../libs/webhost-0.1.2-13.tgz",
-    "ws": "^7.2.5"
-  },
+  "dependencies": {},
   "devDependencies": {
-    "@types/node": "^14.0.13",
-    "@types/ws": "^7.2.5",
     "typescript": "^3.9.5"
   }
 }

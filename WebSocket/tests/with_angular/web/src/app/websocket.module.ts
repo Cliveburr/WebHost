@@ -1,5 +1,4 @@
-import { Host } from '../../../../../src/client';
-import { IPathData } from '../../../../../src/shared';
+import { ClientHost, IPathData } from 'webhost-websocket-client';
 
 export const Path = (data: IPathData): ClassDecorator => {
   return (cls: Object) => {
@@ -8,13 +7,13 @@ export const Path = (data: IPathData): ClassDecorator => {
 }
 
 export class ClientHub<T> {
-  private static __host: Host;
+  private static __host: ClientHost;
 
   public call: T;
 
   public constructor() {
       if (!ClientHub.__host) {
-          ClientHub.__host = new Host(this.host_handleError.bind(this));
+          ClientHub.__host = new ClientHost(this.host_handleError.bind(this));
           ClientHub.__host.connect();
       }
       const data = this['constructor']['__data__'];

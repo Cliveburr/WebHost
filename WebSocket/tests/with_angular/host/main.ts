@@ -3,12 +3,11 @@ import { HttpApplication, IHttpApplication, IConfigure, IConfigureServices,
 import { WebSocketService, WebSocketModule } from '../../../src';
 import { SimpleLoader } from './simple.loader';
 import { ThisSessionProvider } from './session';
-import { ChatServerHub } from './hub/chathub';
 
 @HttpApplication({
     imports: [FileModule, WebSocketModule],
-    providers: [SimpleLoader, ThisSessionProvider, ChatServerHub],
-    exports: [SimpleLoader, ThisSessionProvider, ChatServerHub],
+    providers: [SimpleLoader, ThisSessionProvider],
+    exports: [SimpleLoader, ThisSessionProvider],
     port: 1800,
     wwwroot: __dirname,
     diagnostic: DiagnosticLevel.Normal
@@ -16,7 +15,7 @@ import { ChatServerHub } from './hub/chathub';
 export class HttpTestApplication implements IHttpApplication {
 
     public constructor(
-        private webSocketService: WebSocketService
+        private webSocketService: WebSocketService,
     ) {
     }
 

@@ -49,7 +49,9 @@ export class AppComponent {
             return;
         }
 
-        this.chat.call.sendMsg(this.sender, this.msg);    
+        this.chat.call.sendMsg(this.sender, this.msg);   
+        
+        this.msg = '';
   }
 
   private showMsg(user: string, msg: string): void {

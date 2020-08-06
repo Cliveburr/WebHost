@@ -1,4 +1,4 @@
-import { Injectable/*, ModuleHotImport*/ } from 'providerjs';
+import { Injectable, ModuleHotImport } from 'providerjs';
 import { WS_PATH_LOADER_PROVIDER, IPathLoader } from '../../../src';
 
 import { ChatServerHub } from './hub/chathub';
@@ -9,16 +9,15 @@ import { ChatServerHub } from './hub/chathub';
 export class SimpleLoader implements IPathLoader {
     
     public constructor(
-        //private hotload: ModuleHotImport
+        private hotload: ModuleHotImport
     ) {
     }
 
     public getPath(pathName: string): Object | undefined {
         switch (pathName) {
             case 'chat': {
-                //const file = require('./hub/chathub');
-                //this.hotload.import(file.ChatModule);
-                //return file.ChatServerHub;
+                const hubModule = require('./hub/chat.module.js');
+                this.hotload.import(hubModule.default);
                 return ChatServerHub;
             }
             default: return undefined;
