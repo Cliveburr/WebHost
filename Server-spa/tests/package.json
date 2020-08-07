@@ -1,0 +1,15 @@
+{
+  "name": "webhost-server-spa-test",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "serve": "webhost-spa ./ 1339"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "webhost-server-spa": "file:../webhost-server-spa-0.1.1.tgz"
+  },
+  "devDependencies": {}
+}

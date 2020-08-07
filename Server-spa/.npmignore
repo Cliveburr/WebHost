@@ -1,4 +1,7 @@
+
 .vscode/
-node_modules/
-.npmignore
-package-lock.json
+bin/
+src/
+tests/
+tsconfig*
+*.tgz

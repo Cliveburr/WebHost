@@ -39,6 +39,19 @@
             "outFiles": [
                 "${workspaceFolder}/websocket/bin/**/*.js"
             ]
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "WebSocket Server Spa",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "program": "${workspaceFolder}/server-spa/src/main.ts",
+            "args": [ "../tests", "1339" ],
+            "outFiles": [
+                "${workspaceFolder}/server-spa/bin/**/*.js"
+            ]
         }
     ]
 }

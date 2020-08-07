@@ -1,16 +1,20 @@
 {
   "name": "webhost-server-spa",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Micro server for hosting SPA style apps using the Webhost.",
-  "main": "src/main.ts",
-  "types": "src/main.ts",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "dependencies": {
-    "webhost": "^0.1.0"
+    "providerjs": "file:../../libs/providerjs-0.0.13-7.tgz",
+    "webhost": "file:../http"
   },
   "devDependencies": {
-    "@types/node": "^10.9.4"
+    "@types/node": "^14.0.27"
   },
-  "scripts": {},
+  "scripts": {
+    "build": "rmdir /s /q bin & tsc --watch",
+    "pack": "rmdir /s /q dist & tsc --build tsconfig-package.json"
+  },
   "keywords": [
     "webhost",
     "web",
@@ -22,6 +26,6 @@
   "license": "ISC",
   "repository": "Cliveburr/WebHost",
   "bin": {
-    "webhost-spa": "./src/main.js"
+    "webhost-spa": "./dist/main.js"
   }
 }
