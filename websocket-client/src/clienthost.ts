@@ -25,7 +25,7 @@ export class ClientHost {
     private ws_onmessageBind: any;
 
     public constructor(
-        private handleError: (error?: any) => void
+        private handleError: (error?: any) => boolean
     ) {
         this.paths = {};
         this.msgsIndex = 1;
@@ -212,16 +212,25 @@ export class ClientHost {
     }
 
     private stockReject(stock: IMessageStock, error?: any): void {
-        if (stock.reject) {
-            try {
-                stock.reject(error);
-            }
-            catch {
-                this.handleError(error);    
-            }
+        let isHandled = false;
+        if (typeof this.handleError != 'undefined') {
+            isHandled = this.handleError(error);
         }
-        else {
-            this.handleError(error);
+        
+        if (!isHandled) {
+            if (stock.reject) {
+                try {
+                    stock.reject(error);
+                }
+                catch (err) {
+                    console.error('WebSocket error call not catch!');
+                    console.error(error);
+                }
+            }
+            else {
+                console.error('WebSocket error call not catch!');
+                console.error(error);
+            }
         }
     }
 

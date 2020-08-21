@@ -21,7 +21,9 @@ export class ClientHub<T> {
       this.call = path.caller;
   }
 
-  private host_handleError(error?: any): void {
-    console.error(error);
+  private host_handleError(error?: any): boolean {
+    console.log('handled global: ' + error);
+    //console.error(error);
+    return true;
   }
 }

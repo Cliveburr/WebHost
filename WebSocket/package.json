@@ -6,7 +6,7 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "rmdir /s /q bin & tsc --watch",
-    "package": "rmdir /s /q dist & tsc --build tsconfig-package.json"
+    "pack": "rmdir /s /q dist & tsc --build tsconfig-package.json"
   },
   "keywords": [
     "providerjs",
@@ -17,8 +17,8 @@
   "license": "ISC",
   "repository": "Cliveburr/WebHost",
   "dependencies": {
-    "providerjs": "file:../../libs/providerjs-0.0.13-7.tgz",
-    "webhost": "file:../../libs/webhost-0.1.2-13.tgz",
+    "providerjs": "file:../../libs/providerjs-0.0.13-14.tgz",
+    "webhost": "file:../../libs/webhost-0.1.2-20.tgz",
     "ws": "^7.2.5"
   },
   "devDependencies": {

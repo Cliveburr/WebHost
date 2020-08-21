@@ -67,8 +67,7 @@ export class AppComponent {
       const valueFromServer = await this.chat.call.testServerError();
     }
     catch (error) {
-      console.error(error);
+      console.error('handled on component: ' + error);
     }
-    const valueFromServer = await this.chat.call.testServerError();
   }
 }
