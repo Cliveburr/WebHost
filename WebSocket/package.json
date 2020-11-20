@@ -17,8 +17,8 @@
   "license": "ISC",
   "repository": "Cliveburr/WebHost",
   "dependencies": {
-    "providerjs": "file:../../libs/providerjs-0.0.13-14.tgz",
-    "webhost": "file:../../libs/webhost-0.1.2-20.tgz",
+    "providerjs": "file:../../libs/providerjs-0.0.13-19.tgz",
+    "webhost": "file:../../libs/webhost-0.1.2-25.tgz",
     "ws": "^7.2.5"
   },
   "devDependencies": {

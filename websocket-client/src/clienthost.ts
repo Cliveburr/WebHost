@@ -18,6 +18,7 @@ export class ClientHost {
     private msgsWaiting: OneProcessStack<IMessageStock>;
     private msgsToProcess: OneProcessStack<IMessage>;
     private address?: string;
+    private isForReconnecting: boolean;
 
     private ws_onopenBind: any;
     private ws_onerrorBind: any;
@@ -25,10 +26,12 @@ export class ClientHost {
     private ws_onmessageBind: any;
 
     public constructor(
-        private handleError: (error?: any) => boolean
+        private handleError: (error?: any) => boolean,
+        private handleOnReconnect?: () => void
     ) {
         this.paths = {};
         this.msgsIndex = 1;
+        this.isForReconnecting = false;
         this.ws_onopenBind = this.ws_onopen.bind(this);
         this.ws_onerrorBind = this.ws_onerror.bind(this);
         this.ws_oncloseBind = this.ws_onclose.bind(this);
@@ -60,6 +63,13 @@ export class ClientHost {
             this.ws.removeEventListener('open', this.ws_onopenBind);
             this.ws.addEventListener('close', this.ws_oncloseBind);
             this.ws.addEventListener('message', this.ws_onmessageBind);
+
+            if (this.isForReconnecting && this.handleOnReconnect) {
+                this.handleOnReconnect();
+            }
+            else {
+                this.isForReconnecting = true;
+            }
         }
         this.msgsToSend.checkForStart();
     }
