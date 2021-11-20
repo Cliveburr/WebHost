@@ -12,4 +12,4 @@ export interface IPipelineDelegate {
     (ctx: IContext, next: () => void): void;
 }
 
-export type IPipelineType = IPipelineConstructor | IPipelineDelegate;
+export type IPipelineType = IPipeline | IPipelineConstructor | IPipelineDelegate;

@@ -2,12 +2,12 @@ import * as http from 'http';
 import { ApplicationInstance, DefinedProvider } from 'providerjs';
 import { Dictonary } from '../common/dictonary';
 import { GuidDictonary } from '../common/guid.dictonary';
-import { IPipelineType, IPipeline, IPipelineDelegate } from './pipeline';
+import { IPipelineType, IPipeline, IPipelineDelegate, IPipelineConstructor } from './pipeline';
 import { HttpApplicationData } from './httpApplication.decorator';
 import { Configure } from './configure';
 import { IHttpApplication, IContext } from './httpApplication.data';
 import { ConfigureServices } from './configureServices';
-import { IDiagnostic, DIAGNOSTIC_LEVEL_PROVIDER, DIAGNOSTIC_PROVIDER, DiagnosticLevel, DIAGNOSTIC_INSTANCE } from '../diagnostic/diagnostic.data';
+import { IDiagnostic, DIAGNOSTIC_LEVEL, DiagnosticLevel, DIAGNOSTIC } from '../diagnostic/diagnostic.data';
 import { DefaultDiagnostic } from '../diagnostic/default.diagnostic';
 
 export class HttpApplicationInstance extends ApplicationInstance {
@@ -18,6 +18,7 @@ export class HttpApplicationInstance extends ApplicationInstance {
     private serverValues: Dictonary<any>;
     private contexts: GuidDictonary<IContext>;
     private diagnostic: IDiagnostic;
+    private handleRequestBind?: (...args: any[]) => void;
 
     constructor(
         cls: Object
@@ -45,19 +46,27 @@ export class HttpApplicationInstance extends ApplicationInstance {
     }
 
     private setDiagnostic(): IDiagnostic {
-        let diagnostic = <IDiagnostic>this.module.get(DIAGNOSTIC_PROVIDER, false);
+        const diagnosticLevelProvider = new DefinedProvider(DIAGNOSTIC_LEVEL, this.data.diagnostic || DiagnosticLevel.Normal);
+        let diagnostic = <IDiagnostic>this.module.get(DIAGNOSTIC, false, [diagnosticLevelProvider]);
         if (!diagnostic) {
             diagnostic = new DefaultDiagnostic(this.data.diagnostic || DiagnosticLevel.Normal)
+            const diagnosticInstanceProvider = new DefinedProvider(DIAGNOSTIC, diagnostic);
+            this.module.providers.push(diagnosticInstanceProvider);
+            this.module.exports.push(diagnosticInstanceProvider);
         }
-        const diagnosticLevelProvider = new DefinedProvider(DIAGNOSTIC_LEVEL_PROVIDER, this.data.diagnostic || DiagnosticLevel.Normal);
-        const diagnosticInstanceProvider = new DefinedProvider(DIAGNOSTIC_INSTANCE, diagnostic);
-        this.module.providers.push(diagnosticLevelProvider, diagnosticInstanceProvider);
-        this.module.exports.push(diagnosticLevelProvider, diagnosticInstanceProvider);
         return diagnostic;
     }
 
     private configureServices(): http.Server {
-        const httpServer = http.createServer(this.handleRequest.bind(this));
+        let httpServer: http.Server;
+        if (global.host) {
+            httpServer = global.host.httpServer;
+            httpServer.off('request', global.host.handleRequestBind);
+            delete global.host;
+        }
+        else {
+            httpServer = http.createServer();
+        }
         const toConfigureServices = new ConfigureServices(this.serverValues, httpServer, this.module.injector);
         (<IHttpApplication>this.module.instance).configureServices(toConfigureServices);
         return httpServer;
@@ -74,8 +83,17 @@ export class HttpApplicationInstance extends ApplicationInstance {
     }
 
     private startServer(): void {
-        this.httpServer?.listen(this.data.port || 1338);
-        this.logDiagnostic(`Server started: http://localhost:${(this.data.port || 1338).toString()}`);
+        this.handleRequestBind = this.handleRequest.bind(this);
+        this.httpServer!.on('request', this.handleRequestBind);
+        global.host = {
+            httpServer: this.httpServer!,
+            handleRequestBind: this.handleRequestBind
+        };
+        const port = this.data.port || 1338;
+        if (!this.httpServer!.listening) {
+            this.httpServer!.listen(port);
+        }
+        this.logDiagnostic('Server started: http://localhost:' + port);
     }
 
     private handleRequest(req: http.IncomingMessage, res: http.ServerResponse): void {
@@ -94,14 +112,17 @@ export class HttpApplicationInstance extends ApplicationInstance {
 
     private processPipe(ctx: IContext, index: number): void {
         try {
-            let pipe =  (this.pipes) ? this.pipes[index] : undefined;
+            const pipe =  (this.pipes) ? this.pipes[index] : undefined;
             if (pipe && !ctx.processed) {
-                if (pipe.prototype) {
-                    let instance = this.module.injector.get(pipe) as IPipeline;
+                if ('process' in (pipe as IPipeline)) {
+                    (pipe as IPipeline).process(ctx, this.processPipe.bind(this, ctx, index + 1));
+                }
+                else if ((pipe as IPipelineConstructor).prototype) {
+                    const instance = this.module.injector.get(pipe) as IPipeline;
                     instance.process(ctx, this.processPipe.bind(this, ctx, index + 1));
                 }
                 else {
-                    (<IPipelineDelegate>pipe)(ctx, this.processPipe.bind(this, ctx, index + 1));
+                    (pipe as IPipelineDelegate)(ctx, this.processPipe.bind(this, ctx, index + 1));
                 }
             }
             else {

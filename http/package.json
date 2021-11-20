@@ -19,7 +19,7 @@
   "repository": "Cliveburr/WebHost",
   "license": "ISC",
   "dependencies": {
-    "providerjs": "file:../../libs/providerjs-0.0.13-19.tgz"
+    "providerjs": "file:../../libs/providerjs-0.0.13-20.tgz"
   },
   "devDependencies": {
     "@types/node": "^14.11.1",

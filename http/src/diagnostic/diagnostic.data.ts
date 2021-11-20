@@ -10,6 +10,5 @@ export interface IDiagnostic {
     log(text: any, level?: DiagnosticLevel): void;
 }
 
-export var DIAGNOSTIC_PROVIDER = 'DIAGNOSTIC_PROVIDER';
-export var DIAGNOSTIC_LEVEL_PROVIDER = 'DIAGNOSTIC_LEVEL_PROVIDER';
-export var DIAGNOSTIC_INSTANCE = 'DIAGNOSTIC_INSTANCE';
+export var DIAGNOSTIC_LEVEL = 'DIAGNOSTIC_LEVEL';
+export var DIAGNOSTIC = 'DIAGNOSTIC';
