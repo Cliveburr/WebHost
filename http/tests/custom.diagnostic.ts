@@ -1,13 +1,13 @@
 import { Injectable, StaticProvider, Identify } from 'providerjs';
 import { HttpApplication } from '../src/server/httpApplication.decorator';
 import { IHttpApplication, IConfigureServices, IConfigure } from '../src/server/httpApplication.data';
-import { IDiagnostic, DiagnosticLevel, DIAGNOSTIC_PROVIDER, DIAGNOSTIC_LEVEL_PROVIDER } from '../src/diagnostic/diagnostic.data';
+import { IDiagnostic, DiagnosticLevel, DIAGNOSTIC, DIAGNOSTIC_LEVEL } from '../src/diagnostic/diagnostic.data';
 
 @Injectable()
 class CustomDiagnostic implements IDiagnostic {
 
     public constructor(
-        @Identify(DIAGNOSTIC_LEVEL_PROVIDER) private appDiagnosticLevel: DiagnosticLevel
+        @Identify(DIAGNOSTIC_LEVEL) private appDiagnosticLevel: DiagnosticLevel
     ) {
     }
 
@@ -23,7 +23,7 @@ class CustomDiagnostic implements IDiagnostic {
     }
 }
 
-const CustomDiagnosticProvider = new StaticProvider(DIAGNOSTIC_PROVIDER, CustomDiagnostic);
+const CustomDiagnosticProvider = new StaticProvider(DIAGNOSTIC, CustomDiagnostic);
 
 @HttpApplication({
     providers: [CustomDiagnosticProvider],

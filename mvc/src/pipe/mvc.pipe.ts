@@ -1,7 +1,7 @@
 import * as urlService from 'url';
-import { IPipeline, IContext } from 'webhost';
+import { IPipeline, IContext, IDiagnostic, DiagnosticLevel } from 'webhost';
 import { RouteService } from './route.service';
-import { Injectable } from 'providerjs';
+import { Identify, Injectable } from 'providerjs';
 import { ControllerSelector, HttpReponse } from '../controller/controller.selector';
 import { FormatterService } from '../formatter/formatter.service';
 
@@ -14,12 +14,13 @@ export class HttpError {
 }
 
 @Injectable()
-export class MvcPipe implements IPipeline {
+export class Mvc implements IPipeline {
 
     public constructor(
         private route: RouteService,
         private controllerSelector: ControllerSelector,
-        private formatter: FormatterService
+        private formatter: FormatterService,
+        @Identify('DIAGNOSTIC') private diagnostic: IDiagnostic
     ) {
     }
 
@@ -33,29 +34,22 @@ export class MvcPipe implements IPipeline {
             }
             catch (err) {
                 if (err instanceof HttpError) {
+                    this.diagnostic.log(err.error, DiagnosticLevel.Error);
                     await this.processResult(ctx, new HttpReponse(err.code, err.error));
                 }
                 else {
+                    this.diagnostic.log(err, DiagnosticLevel.Error);
                     await this.processResult(ctx, new HttpReponse(500, err));
                 }
             }
             ctx.processed = true;
-            //     let cb = (result: IHttpResult) => {
-            //         this.processResult(context, result, next);
-            //     };
-
-            //     let controller = context.inject<IController>(controllerType);
-            //     controller.context = context;
-            //     controller.response = cb;
-
-            //     this.processController(context, controller, route, cb);
         }
         next();
     }
 
     private async processResult(ctx: IContext, response: HttpReponse): Promise<void> {
         if (response.data) {
-            const accept = ctx.request.headers["accept"] || 'application/json';
+            const accept = ctx.request.headers['accept'];
             const serialized = await this.formatter.serialize(accept, response.data);
             ctx.response.writeHead(response.code, {
                 'content-type': serialized.contentType,

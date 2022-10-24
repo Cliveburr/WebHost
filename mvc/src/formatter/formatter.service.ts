@@ -23,7 +23,7 @@ export class FormatterService {
         this.formatters = [this.default];
     }
 
-    public async serialize(acceptHeaderValue: string, data: any): Promise<IFormatterSerializeResult> {
+    public async serialize(acceptHeaderValue: string | undefined, data: any): Promise<IFormatterSerializeResult> {
         const formatter = this.getFormatterByAcceptHeader(acceptHeaderValue);
         const serializedData = await formatter.serialize(data);
         return {
@@ -32,12 +32,12 @@ export class FormatterService {
         };
     }
 
-    public async deserialize(contentTypeValue: string, data: string): Promise<any> {
+    public async deserialize(contentTypeValue: string | undefined, data: string): Promise<any> {
         const formatter = this.getFormatterByAcceptHeader(contentTypeValue);
         return await formatter.deserialize(data);
     }
 
-    private getFormatterByAcceptHeader(accept: string): IFormatter {
+    private getFormatterByAcceptHeader(accept: string | undefined): IFormatter {
         //application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,image/png,*/*;q=0.5
 
         if (accept) {

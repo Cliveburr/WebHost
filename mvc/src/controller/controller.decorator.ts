@@ -1,4 +1,5 @@
 import { InjectableData } from 'providerjs';
+import { IActionData } from './controller.selector';
 
 export interface ControllerData extends InjectableData {
 }
@@ -6,6 +7,7 @@ export interface ControllerData extends InjectableData {
 export const Controller = (data?: ControllerData): ClassDecorator => {
     return (cls: Object) => {
         Reflect.defineMetadata('injectable:is', true, cls);
+        Reflect.defineMetadata('mvc:controller:is', true, cls);
         
         if (data) {
             Reflect.defineMetadata('injectable:data', data, cls);
@@ -14,16 +16,22 @@ export const Controller = (data?: ControllerData): ClassDecorator => {
 }
 declare type MethodDecorator = <T>(target: Object, propertyKey: string | symbol, descriptor: TypedPropertyDescriptor<T>) => TypedPropertyDescriptor<T> | void;
 
-export const HttpGet = (): MethodDecorator => {
+export const HttpGet = (path: string): MethodDecorator => {
     return (target: Object, propertyKey: string | symbol, descriptor: TypedPropertyDescriptor<any>) => {
-        //let key = `required:is:${propertyKey?.toString()}:${parameterIndex.toString()}`;
-        Reflect.defineMetadata(propertyKey, descriptor, target);
+        const data = <IActionData>{
+            path,
+            method: 'GET'
+        };
+        Reflect.defineMetadata('mvc:action:data', data, target, propertyKey);
     }
 }
 
-// export const HttpGet = (): ParameterDecorator => {
-//     return (target: Object, propertyKey: string | symbol, parameterIndex: number) => {
-//         let key = `required:is:${propertyKey?.toString()}:${parameterIndex.toString()}`;
-//         Reflect.defineMetadata(key, true, target);
-//     }
-// }
+export const HttpPost = (path: string): MethodDecorator => {
+    return (target: Object, propertyKey: string | symbol, descriptor: TypedPropertyDescriptor<any>) => {
+        const data = <IActionData>{
+            path,
+            method: 'POST'
+        };
+        Reflect.defineMetadata('mvc:action:data', data, target, propertyKey);
+    }
+}

@@ -1,30 +1,40 @@
-import { Controller, HttpGet } from '../../src/controller/controller.decorator';
-import { SessionStore } from '../../src/session/session.store';
-import { Session } from '../../src/session/session';
+import { Controller, HttpGet, HttpPost, Authorization, AllowAnonymous, Identity, Authorize } from '../../src';
+import { IdentitySession, SessionService } from '../service/session-security.service';
 
-interface MySessionData {
-    name: string;
+function checkIsAdmin(identity: IdentitySession): boolean {
+    return identity.isAdmin;
 }
 
 @Controller()
+@Authorization()
 export default class HomeController {
 
     public constructor(
-        private store: SessionStore,
-        private session: Session<MySessionData>,
+        private sessionService: SessionService,
+        private identity: IdentitySession
     ) {
-        if (session) {
-            console.log('Access of: ' + session.data?.name)
+        if (identity) {
+            console.log('Access of: ' + identity.index)
         }
     }
 
-    public home(): any {
-        console.log('home hit');
+    @AllowAnonymous()
+    @HttpGet('/home/{v2}/{v1}')
+    public homeGet(v1: number, v2: string): any {
+        console.log('home hit get', v1);
         return 666;
     }
 
-    public dig(): void {
-        console.log('dig hit');
+    @HttpPost('/home/{v1}')
+    public homePost(v1: number, model: any): any {
+        console.log('home hit post', v1, model);
+        return 777;
+    }
+
+    @HttpGet('/admin')
+    @Authorize(checkIsAdmin)
+    public onlyAdmin(): string {
+        return 'isAdmin';
     }
 
     public async din(): Promise<any> {
@@ -38,25 +48,24 @@ export default class HomeController {
         });
     }
 
-    public login(name: string): { 'session-id': string } {
-        if (this.session) {
-            throw 'Already login!';
-        }
-        else {
-            console.log('login of: ' + name);
-            const session = this.store.createNew<MySessionData>();
-            session.data = {
-                name
-            }
-            return { 'session-id': session.sessionId };
-        }
+    @AllowAnonymous()
+    @HttpGet('/login/{admin}')
+    public login(admin: string): { 'session-header': string } {
+        // if (this.session) {
+        //     throw 'Already login!';
+        // }
+        // else {
+            var identity = this.sessionService.login(admin);
+            console.log('login of: ' + identity);
+            return { 'session-header': identity.sessionHeader };
+        //}
     }
 
-    public logoff(): void {
-        console.log('logoff of: ' + this.session.data?.name);
+    // public logoff(): void {
+    //     console.log('logoff of: ' + this.session.data?.name);
 
-        if (this.session) {
-            this.store.remove(this.session.sessionId);
-        }
-    }
+    //     if (this.session) {
+    //         this.store.remove(this.session.sessionId);
+    //     }
+    // }
 }
