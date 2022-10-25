@@ -38,6 +38,7 @@ class FileInfo {
     public hasContent: boolean | undefined;
     public headers: OutgoingHttpHeaders;
     public statusCode: number;
+    public isExist: boolean;
     public isValid: boolean;
 
     public constructor(
@@ -47,14 +48,15 @@ class FileInfo {
     ) {
         this.statusCode = 0;
         this.headers = {};
-        this.isValid = this.checkFile();
+        this.isExist = this.checkFileExist();
+        this.isValid = this.checkRequestValid();
     }
 
-    private checkFile(): boolean {
-        if (!fs.existsSync(this.file)) {
-            return false;
-        }
+    private checkFileExist(): boolean {
+        return fs.existsSync(this.file);
+    }
 
+    private checkRequestValid(): boolean {
         if (!this.checkContenType()) {
             return false;
         }
@@ -131,26 +133,28 @@ export class StaticFiles implements IPipeline {
     }
 
     public process(ctx: IContext, next: () => void): void {
-        let wwwroot = ctx.serverValues.get('wwwroot');
+        const wwwroot = ctx.serverValues.get('wwwroot');
         if (!wwwroot) {
             throw 'To use static files, need to set wwwroot on application!';
         }
 
-        let pu = url.parse(ctx.request.url || '');
-        let file = path.resolve(wwwroot + pu.pathname);
-        let fileInfo = new FileInfo(file, ctx.request.headers, this.fileTypes);
+        const pu = url.parse(ctx.request.url || '');
+        const file = path.resolve(wwwroot + pu.pathname);
+        const fileInfo = new FileInfo(file, ctx.request.headers, this.fileTypes);
 
         if (fileInfo.isValid) {
-            ctx.log(`${ctx.request.method}:${fileInfo.statusCode}:${file}`);
+            if (fileInfo.isExist) {
+                ctx.log(`${ctx.request.method}:${fileInfo.statusCode}:${file}`);
 
-            ctx.response.writeHead(fileInfo.statusCode, fileInfo.headers);
-            if (fileInfo.hasContent) {
-                ctx.response.write(fs.readFileSync(file));
+                ctx.response.writeHead(fileInfo.statusCode, fileInfo.headers);
+                if (fileInfo.hasContent) {
+                    ctx.response.write(fs.readFileSync(file));
+                }
+                ctx.processed = true;
             }
-            ctx.processed = true;
-        }
-        else {
-            ctx.log(`${ctx.request.method}:INVALID:${file}`, DiagnosticLevel.Error);
+            else {
+                ctx.log(`${ctx.request.method}:INVALID:${file}`, DiagnosticLevel.Error);
+            }
         }
 
         next();

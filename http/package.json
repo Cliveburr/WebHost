@@ -5,9 +5,10 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "rmdir /s /q bin & tsc --watch",
-    "pack": "rmdir /s /q dist & tsc --build tsconfig-package.json",
-    "pushishoff": "npm pack"
+    "build": "npm run build-clean && tsc --watch",
+    "build-clean": "if exist \"bin\" (rmdir /s /q bin)",
+    "pack": "npm run pack-clean && tsc --build tsconfig-package.json",
+    "pack-clean": "if exist \"dist\" (rmdir /s /q dist)"
   },
   "keywords": [
     "webhost",

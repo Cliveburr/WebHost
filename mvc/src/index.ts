@@ -1,4 +1,5 @@
 export * from './controller/controller.decorator';
+export * from './controller/reponse-model';
 export * from './module/mvc.module';
 export * from './module/configure';
 export * from './pipe/mvc.pipe';

@@ -2,16 +2,11 @@ import * as urlService from 'url';
 import { IPipeline, IContext, IDiagnostic, DiagnosticLevel } from 'webhost';
 import { RouteService } from './route.service';
 import { Identify, Injectable } from 'providerjs';
-import { ControllerSelector, HttpReponse } from '../controller/controller.selector';
+import { ControllerSelector } from '../controller/controller.selector';
 import { FormatterService } from '../formatter/formatter.service';
+import { HttpError, HttpReponse } from '../controller/reponse-model';
 
-export class HttpError {
-    public constructor(
-        public code: number,
-        public error?: string
-    ) {
-    }
-}
+
 
 @Injectable()
 export class Mvc implements IPipeline {

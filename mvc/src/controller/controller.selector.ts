@@ -4,22 +4,10 @@ import * as fs from 'fs';
 import { IContext } from 'webhost';
 import { Injectable, Injector, AsRequestProvider, DefinedProvider } from 'providerjs';
 import { IRouteInfo } from '../pipe/route.service';
-import { HttpError } from '../pipe/mvc.pipe';
 import { FormatterService } from '../formatter/formatter.service';
 import { IAuthorizationEvent } from '../security/authorization.decorator';
-
-export class HttpReponse {
-
-    public constructor(
-        public code: number,
-        public data?: any
-    ) {
-    }
-
-    public get isHttpResponse(): boolean {
-        return true;
-    }
-}
+import { IActionData } from './controller.decorator';
+import { HttpError, HttpReponse } from './reponse-model';
 
 interface IControllerCache {
     type: Object;
@@ -43,11 +31,6 @@ interface IPathCache {
 enum PathCacheType {
     fixed = 1,
     value = 2
-}
-
-export interface IActionData {
-    path: string;
-    method: string;
 }
 
 interface IActionInfo {

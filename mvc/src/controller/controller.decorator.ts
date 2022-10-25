@@ -1,7 +1,11 @@
 import { InjectableData } from 'providerjs';
-import { IActionData } from './controller.selector';
 
 export interface ControllerData extends InjectableData {
+}
+
+export interface IActionData {
+    path: string;
+    method: string;
 }
 
 export const Controller = (data?: ControllerData): ClassDecorator => {
