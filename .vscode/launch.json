@@ -1,0 +1,57 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Http Test",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "program": "${workspaceFolder}/http/tests/all.tests.ts",
+            "outFiles": [
+                "${workspaceFolder}/http/bin/**/*.js"
+            ]
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Mvc Test",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "program": "${workspaceFolder}/mvc/tests/all.tests.ts",
+            "outFiles": [
+                "${workspaceFolder}/mvc/bin/**/*.js"
+            ]
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "WebSocket Test",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "program": "${workspaceFolder}/websocket/tests/with_angular/host/main.ts",
+            "outFiles": [
+                "${workspaceFolder}/websocket/bin/**/*.js"
+            ]
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "WebSocket Server Spa",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "program": "${workspaceFolder}/server-spa/src/main.ts",
+            "args": [ "../tests", "1339" ],
+            "outFiles": [
+                "${workspaceFolder}/server-spa/bin/**/*.js"
+            ]
+        }
+    ]
+}

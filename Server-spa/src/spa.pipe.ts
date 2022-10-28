@@ -1,4 +1,5 @@
-import { Injectable, IPipeline, IContext } from 'webhost';
+import { Injectable } from 'providerjs';
+import { IPipeline, IContext } from 'webhost';
 import { parse } from 'url';
 
 @Injectable()

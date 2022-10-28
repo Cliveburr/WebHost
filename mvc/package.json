@@ -1,0 +1,29 @@
+{
+  "name": "webhost-mvc",
+  "version": "0.0.1",
+  "description": "",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "npm run build-clean && tsc --watch",
+    "build-clean": "if exist \"bin\" (rmdir /s /q bin)",
+    "pack": "npm run pack-clean && tsc --build tsconfig-package.json",
+    "pack-clean": "if exist \"dist\" (rmdir /s /q dist)"
+  },
+  "keywords": [
+    "webhost",
+    "api",
+    "mvc"
+  ],
+  "author": "Adilson Manzoli junior",
+  "license": "ISC",
+  "repository": "Cliveburr/WebHost",
+  "dependencies": {
+    "providerjs": "^0.0.15",
+    "webhost": "^0.1.2"
+  },
+  "devDependencies": {
+    "@types/node": "^18.11.3",
+    "typescript": "^4.8.4"
+  }
+}

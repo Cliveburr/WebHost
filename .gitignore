@@ -1,5 +1,14 @@
+
+bin/
+dist/
 node_modules/
-package-lock.json
+
+
 *.js
 *.d.ts
+!global.d.ts
 *.js.map
+
+!/mvc/tests/wwwroot/*.js
+
+*.tgz

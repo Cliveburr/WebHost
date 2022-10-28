@@ -1,0 +1,23 @@
+{
+  "name": "webhost-websocket-client",
+  "version": "0.0.1",
+  "description": "WebSocket client implemantation for WebHost-websocket.",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "rmdir /s /q bin & tsc --watch",
+    "package": "rmdir /s /q dist & tsc --build tsconfig-package.json"
+  },
+  "keywords": [
+    "providerjs",
+    "webhost",
+    "websocket"
+  ],
+  "author": "Adilson Manzoli Junior",
+  "license": "ISC",
+  "repository": "Cliveburr/WebHost",
+  "dependencies": {},
+  "devDependencies": {
+    "typescript": "^3.9.5"
+  }
+}

@@ -1,14 +1,14 @@
+import { InjectableData, AsRequestProvider } from 'providerjs';
+import { IPathData } from './path.data';
 
-export interface PathData {
-    name: string;
-}
-
-export const Path = (data: PathData): ClassDecorator => {
+export const Path = (data: IPathData): ClassDecorator => {
     return (cls: Object) => {
-        Reflect.defineMetadata('injectable:is', false, cls);
-        Reflect.defineMetadata('injectable:data', data, cls);
-        paths[data.name.toLowerCase()] = cls;
-    };
-};
-
-export const paths: { [key: string]: Object } = {};
+        const injectableData: InjectableData = {
+            provider: new AsRequestProvider(cls)
+        };
+        Reflect.defineMetadata('injectable:is', true, cls);
+        Reflect.defineMetadata('injectable:data', injectableData, cls);
+        Reflect.defineMetadata('path:is', true, cls);
+        Reflect.defineMetadata('path:data', data, cls);
+    }
+}

@@ -1,5 +1,5 @@
-import { Module } from "webhost";
-import { WebSocketService } from "../services/websocket.service";
+import { Module } from "providerjs";
+import { WebSocketService } from "./websocket.service";
 
 @Module({
     providers: [WebSocketService],

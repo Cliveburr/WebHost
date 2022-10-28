@@ -1,0 +1,7 @@
+{
+    "/": {
+      "target": "http://localhost:1800",
+      "secure": false,
+      "ws":true
+    }
+  }

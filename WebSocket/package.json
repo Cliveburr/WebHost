@@ -2,21 +2,28 @@
   "name": "webhost-websocket",
   "version": "0.1.1",
   "description": "WebSocket implemantation for WebHost.",
-  "dependencies": {
-    "tslib": "^1.9.3",
-    "webhost": "0.1.1",
-    "ws": "^6.0.0"
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "rmdir /s /q bin & tsc --watch",
+    "pack": "rmdir /s /q dist & tsc --build tsconfig-package.json"
   },
-  "devDependencies": {
-    "@types/node": "^10.9.4",
-    "@types/ws": "^6.0.0"
-  },
-  "scripts": {},
   "keywords": [
+    "providerjs",
     "webhost",
     "websocket"
   ],
   "author": "Adilson Manzoli Junior",
   "license": "ISC",
-  "repository": "Cliveburr/WebHost"
+  "repository": "Cliveburr/WebHost",
+  "dependencies": {
+    "providerjs": "file:../../libs/providerjs-0.0.13-19.tgz",
+    "webhost": "file:../../libs/webhost-0.1.2-25.tgz",
+    "ws": "^7.2.5"
+  },
+  "devDependencies": {
+    "@types/node": "^14.0.13",
+    "@types/ws": "^7.2.5",
+    "typescript": "^3.9.5"
+  }
 }
