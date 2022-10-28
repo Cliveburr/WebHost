@@ -8,6 +8,7 @@ export interface HttpApplicationData extends ApplicationData {
     diagnostic?: DiagnosticLevel;
     approot?: string;
     wwwroot?: string;
+    timeout?: number;
 }
 
 export const HttpApplication = (data: HttpApplicationData): ClassDecorator => {

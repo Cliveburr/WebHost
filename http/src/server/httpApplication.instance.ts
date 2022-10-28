@@ -104,29 +104,60 @@ export class HttpApplicationInstance extends ApplicationInstance {
             response: res,
             serverValues: this.serverValues,
             values: new Dictonary<any>(),
-            log: this.logDiagnostic.bind(this)
+            log: this.logDiagnostic.bind(this),
+            terminated: false
         };
         ctx.guid = this.contexts.autoSet(ctx);
         this.processPipe(ctx, 0);
     }
 
+    private timeoutHandler(ctx: IContext): void {
+        this.logDiagnostic(`Timeout: ${ctx.request.url}`, DiagnosticLevel.Error);
+        ctx.response.statusCode = 408;
+        ctx.response.end();
+        ctx.terminated = true;
+        this.contexts.remove(ctx.guid);
+
+        if (ctx.processResult) {
+            Promise.resolve(ctx.processResult)
+                .then()
+                .catch();
+        }
+    }
+
     private processPipe(ctx: IContext, index: number): void {
+        if (ctx.terminated) {
+            if (ctx.processResult) {
+                Promise.resolve(ctx.processResult)
+                    .then()
+                    .catch();
+            }
+            return;
+        }
+        if (ctx.timeout) {
+            clearTimeout(ctx.timeout);
+            delete ctx.timeout;
+        }
         try {
-            const pipe =  (this.pipes) ? this.pipes[index] : undefined;
+            const pipe = (this.pipes) ? this.pipes[index] : undefined;
             if (pipe && !ctx.processed) {
+                if (this.data.timeout) {
+                    ctx.timeout = setTimeout(this.timeoutHandler.bind(this, ctx), this.data.timeout);
+                }
                 if ('process' in (pipe as IPipeline)) {
-                    (pipe as IPipeline).process(ctx, this.processPipe.bind(this, ctx, index + 1));
+                    ctx.processResult = (pipe as IPipeline).process(ctx, this.processPipe.bind(this, ctx, index + 1));
                 }
                 else if ((pipe as IPipelineConstructor).prototype) {
                     const instance = this.module.injector.get(pipe) as IPipeline;
-                    instance.process(ctx, this.processPipe.bind(this, ctx, index + 1));
+                    ctx.processResult = instance.process(ctx, this.processPipe.bind(this, ctx, index + 1));
                 }
                 else {
-                    (pipe as IPipelineDelegate)(ctx, this.processPipe.bind(this, ctx, index + 1));
+                    ctx.processResult = (pipe as IPipelineDelegate)(ctx, this.processPipe.bind(this, ctx, index + 1));
                 }
             }
             else {
                 ctx.response.end();
+                ctx.terminated = true;
                 this.contexts.remove(ctx.guid);
             }
         }
@@ -135,6 +166,7 @@ export class HttpApplicationInstance extends ApplicationInstance {
             ctx.response.statusCode = 500;
             ctx.response.write(JSON.stringify(err));
             ctx.response.end();
+            ctx.terminated = true;
             this.contexts.remove(ctx.guid);
         }
     }

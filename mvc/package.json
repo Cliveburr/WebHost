@@ -20,7 +20,7 @@
   "repository": "Cliveburr/WebHost",
   "dependencies": {
     "providerjs": "^0.0.15",
-    "webhost": "file:../http"
+    "webhost": "^0.1.2"
   },
   "devDependencies": {
     "@types/node": "^18.11.3",

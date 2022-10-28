@@ -214,10 +214,14 @@ export class ControllerSelector {
         const retData = method.apply(controller, args);
 
         if (this.isPromise(retData)) {
-            return new Promise<HttpReponse>(executor => {
-                retData.then(value => {
-                    executor(this.checkData(value));
-                });
+            return new Promise<HttpReponse>((executor, reject) => {
+                retData
+                    .then(value => {
+                        executor(this.checkData(value));
+                    })
+                    .catch(err => {
+                        reject(err);
+                    });
             });
         }
         else {

@@ -12,6 +12,9 @@ export interface IContext {
     serverValues: Dictonary<any>;
     values: Dictonary<any>;
     log: (text: any, level?: DiagnosticLevel) => void;
+    timeout?: any;
+    processResult?: void | Promise<void>;
+    terminated: boolean;
 }
 
 export interface IHttpApplication {

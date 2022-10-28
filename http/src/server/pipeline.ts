@@ -1,7 +1,7 @@
 import { IContext } from './httpApplication.data';
 
 export interface IPipeline {
-    process(ctx: IContext, next: () => void): void;
+    process(ctx: IContext, next: () => void): void | Promise<void>;
 }
 
 export interface IPipelineConstructor {
@@ -9,7 +9,7 @@ export interface IPipelineConstructor {
 }
 
 export interface IPipelineDelegate {
-    (ctx: IContext, next: () => void): void;
+    (ctx: IContext, next: () => void): void | Promise<void>;
 }
 
 export type IPipelineType = IPipeline | IPipelineConstructor | IPipelineDelegate;

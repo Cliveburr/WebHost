@@ -49,23 +49,15 @@ class FileInfo {
         this.statusCode = 0;
         this.headers = {};
         this.isExist = this.checkFileExist();
-        this.isValid = this.checkRequestValid();
+        this.isValid = this.checkContenType();
+
+        if (this.isExist) {
+            this.checkContentAndCache();
+        }
     }
 
     private checkFileExist(): boolean {
         return fs.existsSync(this.file);
-    }
-
-    private checkRequestValid(): boolean {
-        if (!this.checkContenType()) {
-            return false;
-        }
-
-        if (!this.checkContentAndCache()) {
-            return false;
-        }        
-
-        return true;
     }
 
     private checkContenType(): boolean {
@@ -89,14 +81,17 @@ class FileInfo {
         return false;
     }
 
-    private checkContentAndCache(): boolean {
+    private checkContentAndCache(): void {
+        const stat = fs.statSync(this.file);
+        this.headers['Content-Length'] = stat.size;
+
         if (this.requestHeaders['cache-control'] && this.requestHeaders['cache-control'] == 'no-cache') {
             this.statusCode = 200;
             this.hasContent = true;
-            return true;
+            return;
         }
 
-        let modified = fs.statSync(this.file).mtime;
+        const modified = stat.mtime;
         modified.setMilliseconds(0);
 
         this.headers['Last-Modified'] = modified.toString();
@@ -109,13 +104,12 @@ class FileInfo {
 
             if (modified.getTime() <= since.getTime()) {
                 this.statusCode = 304;
-                return true;
+                return;
             }
         }
 
         this.statusCode = 200;
         this.hasContent = true;
-        return true;
     }
 }
 
@@ -132,7 +126,7 @@ export class StaticFiles implements IPipeline {
         }
     }
 
-    public process(ctx: IContext, next: () => void): void {
+    public async process(ctx: IContext, next: () => void): Promise<void> {
         const wwwroot = ctx.serverValues.get('wwwroot');
         if (!wwwroot) {
             throw 'To use static files, need to set wwwroot on application!';
@@ -143,20 +137,44 @@ export class StaticFiles implements IPipeline {
         const fileInfo = new FileInfo(file, ctx.request.headers, this.fileTypes);
 
         if (fileInfo.isValid) {
+            ctx.processed = true;
             if (fileInfo.isExist) {
                 ctx.log(`${ctx.request.method}:${fileInfo.statusCode}:${file}`);
 
-                ctx.response.writeHead(fileInfo.statusCode, fileInfo.headers);
                 if (fileInfo.hasContent) {
-                    ctx.response.write(fs.readFileSync(file));
+                    ctx.response.writeHead(fileInfo.statusCode, fileInfo.headers);
+                    await this.processFile(ctx, file);
+                    // const readStream = fs.createReadStream(file);
+                    // readStream.on('open',  () => {
+                    //     readStream.pipe(ctx.response);
+                    // });
+                    // readStream.on('close', () => {
+                    //     next();
+                    // });
+                    // readStream.on('error', (err) => {
+                    //     ctx.log(err, DiagnosticLevel.Error);
+                    // });
+                    // return;
                 }
-                ctx.processed = true;
+                else {
+                    ctx.response.writeHead(fileInfo.statusCode, fileInfo.headers);
+                }
             }
             else {
                 ctx.log(`${ctx.request.method}:INVALID:${file}`, DiagnosticLevel.Error);
             }
         }
-
         next();
+    }
+
+    private processFile(ctx: IContext, file: string): Promise<void> {
+        return new Promise<void>((e, r) => {
+            const readStream = fs.createReadStream(file);
+            readStream.on('open',  () => {
+                readStream.pipe(ctx.response);
+            });
+            readStream.on('end', e);
+            readStream.on('error', r);
+        });
     }
 }

@@ -1,12 +1,12 @@
 import * as urlService from 'url';
+import { ReadStream } from 'node:fs';
+import { Buffer } from 'node:buffer';
 import { IPipeline, IContext, IDiagnostic, DiagnosticLevel } from 'webhost';
 import { RouteService } from './route.service';
 import { Identify, Injectable } from 'providerjs';
 import { ControllerSelector } from '../controller/controller.selector';
 import { FormatterService } from '../formatter/formatter.service';
 import { HttpError, HttpReponse } from '../controller/reponse-model';
-
-
 
 @Injectable()
 export class Mvc implements IPipeline {
@@ -23,6 +23,7 @@ export class Mvc implements IPipeline {
         const urlParsed = urlService.parse(ctx.request.url || '/');
         const route = this.route.getRouteByUrl(urlParsed.pathname || '');
         if (route) {
+            ctx.processed = true;
             try {
                 const result = await this.controllerSelector.processRequest(ctx, route);
                 await this.processResult(ctx, result); 
@@ -37,7 +38,6 @@ export class Mvc implements IPipeline {
                     await this.processResult(ctx, new HttpReponse(500, err));
                 }
             }
-            ctx.processed = true;
         }
         next();
     }
@@ -46,11 +46,18 @@ export class Mvc implements IPipeline {
         if (response.data) {
             const accept = ctx.request.headers['accept'];
             const serialized = await this.formatter.serialize(accept, response.data);
-            ctx.response.writeHead(response.code, {
-                'content-type': serialized.contentType,
-                'content-length': serialized.serializedData.length
+            return new Promise<void>((e, r) => {
+                const data = Buffer.from(serialized.serializedData);
+                ctx.response.writeHead(response.code, {
+                    'content-type': serialized.contentType,
+                    'content-length': data.byteLength
+                });
+                const stream = ReadStream.from(data);
+                stream.once('end', e);
+                stream.once('error', r);
+                stream.pipe(ctx.response);
+                stream.emit('data', data);
             });
-            ctx.response.write(serialized.serializedData);
         }
         else {
             ctx.response.writeHead(response.code);
