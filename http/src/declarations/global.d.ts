@@ -1,4 +1,4 @@
-declare type Server = import('http').Server
+declare type Server = import('http').Server;
 
 declare var host: {
     httpServer: Server,

@@ -3,8 +3,8 @@
     "typescript.referencesCodeLens.enabled": false,
      "files.exclude": {
         "**/node_modules": true,
-        "**/bin": false,
-        "**/dist": false
+        "**/bin": true,
+        "**/dist": true
     },
     "editor.tabSize": 4,
     "editor.insertSpaces": true

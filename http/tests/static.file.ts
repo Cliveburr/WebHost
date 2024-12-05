@@ -1,28 +1,15 @@
-import { HttpApplication } from '../src/server/httpApplication.decorator';
-import { IHttpApplication, IConfigureServices, IConfigure } from '../src/server/httpApplication.data';
-import { FileModule, DefaultFiles, StaticFiles, NotFound } from '../src';
+import { WebHost } from "../src";
+import { DefaultFiles } from "../src/file/defaultfiles.pipe";
+import { NotFound } from "../src/file/notfound.pipe";
+import { StaticFiles } from "../src/file/staticfiles.pipe";
 
-@HttpApplication({
-    imports: [FileModule],
-    port: 8081,
+const host = new WebHost({
+    port: 8080,
     wwwroot: __dirname + '\\..\\..\\tests\\wwwroot'
-})
-export class StaticPipe implements IHttpApplication {
-    
-    public constructor(
-    ) {
-    }
+});
 
-    public configureServices(services: IConfigureServices): void {
-    }
+host.use(DefaultFiles);
+host.use(StaticFiles);
+host.use(NotFound);
 
-    public configure(app: IConfigure): void {
-     
-        app.use(DefaultFiles);
-
-        app.use(StaticFiles);
-
-        app.use(NotFound);
-
-    }
-}
+host.run();

@@ -1,15 +1,16 @@
-import { IContext } from './httpApplication.data';
+import { IContainer } from 'providerjs';
+import { IRequestContext } from './request.context';
 
 export interface IPipeline {
-    process(ctx: IContext, next: () => void): void | Promise<void>;
+    process(ctx: IRequestContext): Promise<void>;
 }
 
 export interface IPipelineConstructor {
-    new (...args: any[]): IPipeline;
+    new (container: IContainer): IPipeline;
 }
 
 export interface IPipelineDelegate {
-    (ctx: IContext, next: () => void): void | Promise<void>;
+    (ctx: IRequestContext): Promise<void>;
 }
 
 export type IPipelineType = IPipeline | IPipelineConstructor | IPipelineDelegate;

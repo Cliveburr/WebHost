@@ -20,10 +20,11 @@
   "repository": "Cliveburr/WebHost",
   "license": "ISC",
   "dependencies": {
-    "providerjs": "^0.0.15"
+    "tslib": "^2.8.1",
+    "providerjs": "file:../../providerjs"
   },
   "devDependencies": {
-    "@types/node": "^18.11.3",
-    "typescript": "^4.8.4"
+    "@types/node": "^22.10.1",
+    "typescript": "^5.7.2"
   }
 }
